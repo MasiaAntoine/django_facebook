@@ -5,11 +5,11 @@
 Le but de ce projet est de faire un facebook-Like en django.
 Pour ce faire, on utilisera en technologie :
 
-| Technologies | Utilisations                                                              |
-| ------------ | ------------------------------------------------------------------------- |
+| Technologies | Utilisations                                                           |
+| ------------ | ---------------------------------------------------------------------- |
 | Docker       | Initialisation du projet, creation d'un super user, et de la base de done |
-| Django       | Partie back et front du projet                                            |
-| Bootstrap    | style du projet                                                           |
+| Django       | Partie back et front du projet                                         |
+| Bootstrap    | style du projet                                                        |
 
 ## Initiation du projet
 
