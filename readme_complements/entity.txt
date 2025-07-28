@@ -1,0 +1,74 @@
+Listing des entites ainsi que des attribus
+
+User {
+	l'entité User est deja pres definis par django.contrib.auth.models
+	photo_profil : string,
+	telephone : int,
+}
+
+Amis {
+	id : int AI not null,
+	demandeur_id : int,
+	receveur_id : int,
+	accepter : bool,
+	bloquer : bool,
+}
+
+Posts {
+	id : int AI not null,
+	title : string,
+	description,
+	category : FK->Category,
+	photos : string,
+	is_story : bool,
+	user_id : FK User
+	created_at : date,
+	updated_at : date,
+	deleted_at : date,
+}
+
+Category {
+	id : int AI not null,
+	title : string,
+	description : string,
+	created_at : date,
+	updated_at : date,
+	deleted_at : date,
+}
+
+Reactions {
+	id : int
+	user : FK -> User,
+	post : FK -> Post,
+	type : string,
+	created_at : datetime,
+}
+
+Commentaire {
+	id : int,
+	user : FK -> User,
+	post : FK -> Post,
+	contenu : text,
+	created_at : datetime,
+	updated_at : datetime,
+}
+
+Partages {
+	id : int,
+	post_partage : FK -> Post,
+	partageur : FK -> User,
+	commentaire : string,
+	created_at : datetime,
+}
+
+Notifications {
+	id : int,
+	recipient : FK -> User,
+	actor : FK -> User,
+	type : string,
+	post : FK -> Post,
+	commentaire : FK -> Commentaire,
+	created_at : datetime,
+	is_read : bool,
+}
+

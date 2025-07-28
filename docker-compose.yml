@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: postgres_django
+    restart: always
+    environment:
+      POSTGRES_DB: ${DJANGO_DATABASE}
+      POSTGRES_USER: ${DJANGO_USER}
+      POSTGRES_PASSWORD: ${DJANGO_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  django-web:
+    build: .
+    container_name: django-docker
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DEBUG: ${DEBUG}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      DATABASE_NAME: ${DJANGO_DATABASE}
+      DATABASE_USERNAME: ${DJANGO_USER}
+      DATABASE_PASSWORD: ${DJANGO_PASSWORD}
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DJANGO_SUPERUSER_USERNAME: ${SUPERUSER_USERNAME}
+      DJANGO_SUPERUSER_EMAIL: ${SUPERUSER_EMAIL}
+      DJANGO_SUPERUSER_PASSWORD: ${SUPERUSER_PASSWORD}
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
