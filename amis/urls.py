@@ -4,5 +4,5 @@ from . import views
 app_name = 'amis'
 
 urlpatterns = [
-    # URLs pour la gestion des amis
+    path('rechercher/', views.rechercher_amis, name='rechercher_amis'),
 ]
