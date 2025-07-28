@@ -43,7 +43,14 @@
                     {% endif %}
                     <li class="nav-item">
                         <a class="nav-link text-white" href="{% url 'mon_compte' %}">
-                            <i class="fas fa-user-circle"></i> Mon compte
+                            {#                            <i class="fas fa-user-circle"></i> Mon compte#}
+                            {% if user.photo_profil and user.photo_profil.url %}
+                                <img src="{{ user.photo_profil.url }}" alt="Mon compte" class="rounded-circle"
+                                     style="height: 35px; width: 35px; object-fit: cover;">
+                            {% else %}
+                                <img src="{% static "default_logo/default.webp" %}" alt="Mon compte" class="rounded-circle"
+                                     style="height: 35px; width: 35px; object-fit: cover;">
+                            {% endif %}
                         </a>
                     </li>
                     <li class="nav-item">
