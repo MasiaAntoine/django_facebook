@@ -1,0 +1,56 @@
+# Ignore Python files
+*.py
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.egg-info/
+
+# Ignore Django specific files
+**/migrations/
+manage.py
+settings.py
+wsgi.py
+asgi.py
+urls.py
+models.py
+views.py
+admin.py
+apps.py
+tests.py
+
+# Ignore Django templates (contains Django template tags)
+*.html
+
+# Ignore virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Ignore database files
+*.sqlite3
+*.db
+
+# Ignore Docker files
+Dockerfile
+docker-compose.yml
+entrypoint.sh
+
+# Ignore documentation
+README.md
+*.txt
+
+# Ignore media and static files
+media/
+static/
+
+# Allow formatting for pure web files (not Django templates)
+# Only format pure CSS/JS files without Django template tags
+*.css
+*.scss
+*.js
+*.jsx
+!*.ts
+!*.tsx
+!*.json
