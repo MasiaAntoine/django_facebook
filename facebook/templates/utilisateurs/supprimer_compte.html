@@ -1,0 +1,12 @@
+{% extends "../facebook/base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Supprimer mon compte</h2>
+  <p class="text-danger">⚠️ Cette action est irréversible et entraînera la suppression de toutes vos données (conformément au RGPD).</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Supprimer définitivement mon compte</button>
+    <a href="{% url 'mon_compte' %}" class="btn btn-secondary">Annuler</a>
+  </form>
+</div>
+{% endblock %}

@@ -135,3 +135,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # definition du model pour l'authentification de l'utilisateur
 AUTH_USER_MODEL = 'utilisateurs.UtilisateurPersonnaliser'
+
+# permet la connexion par adresse mail plutot que par username
+AUTHENTICATION_BACKENDS = ['utilisateurs.backends.EmailBackend']

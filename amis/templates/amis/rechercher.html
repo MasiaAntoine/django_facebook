@@ -1,82 +1,76 @@
-<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rechercher des amis</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  </head>
-  <body>
+{% extends "facebook/base.html" %}
+{% load static %}
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
     <div class="container mt-4">
-      <div class="row justify-content-center">
-        <div class="col-md-8">
-          <h2 class="mb-4">🔍 Rechercher des amis</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h2 class="mb-4">🔍 Rechercher des amis</h2>
 
-          <!-- Barre de recherche -->
-          <form method="GET" class="mb-4">
-            <div class="input-group">
-              <input
-                type="text"
-                class="form-control"
-                name="q"
-                value="{{ query }}"
-                placeholder="Rechercher par nom ou prénom..."
-                aria-label="Rechercher des amis"
-              />
-              <button class="btn btn-primary" type="submit">
-                <i class="fas fa-search"></i>
-                Rechercher
-              </button>
-            </div>
-          </form>
+                <!-- Barre de recherche -->
+                <form method="GET" class="mb-4">
+                    <div class="input-group">
+                        <input
+                                type="text"
+                                class="form-control"
+                                name="q"
+                                value="{{ query }}"
+                                placeholder="Rechercher par nom ou prénom..."
+                                aria-label="Rechercher des amis"
+                        />
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                            Rechercher
+                        </button>
+                    </div>
+                </form>
 
-          <!-- Résultats de recherche -->
-          {% if query %}
-          <h4 class="mb-3">Résultats pour "{{ query }}"</h4>
-          {% if utilisateurs %}
-          <div class="row">
-            {% for utilisateur in utilisateurs %}
-            <div class="col-md-6 mb-3">
-              <div class="card">
-                <div class="card-body">
-                  <div class="d-flex align-items-center">
-                    {% if utilisateur.photo_profil %}
-                    <img
-                      src="{{ utilisateur.photo_profil.url }}"
-                      alt="Photo de profil"
-                      class="rounded-circle me-3"
-                      style="width: 50px; height: 50px; object-fit: cover"
-                    />
+                <!-- Résultats de recherche -->
+                {% if query %}
+                    <h4 class="mb-3">Résultats pour "{{ query }}"</h4>
+                    {% if utilisateurs %}
+                        <div class="row">
+                            {% for utilisateur in utilisateurs %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                {% if utilisateur.photo_profil %}
+                                                    <img
+                                                            src="{{ utilisateur.photo_profil.url }}"
+                                                            alt="Photo de profil"
+                                                            class="rounded-circle me-3"
+                                                            style="width: 50px; height: 50px; object-fit: cover"
+                                                    />
+                                                {% else %}
+                                                    <div
+                                                            class="bg-secondary rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                                            style="width: 50px; height: 50px"
+                                                    >
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div class="flex-grow-1">
+                                                    <h6 class="card-title mb-1">{{ utilisateur.first_name }} {{ utilisateur.last_name }}</h6>
+                                                    <p class="card-text text-muted mb-0">@{{ utilisateur.username }}</p>
+                                                </div>
+                                                <button class="btn btn-outline-primary btn-sm">Ajouter</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
                     {% else %}
-                    <div
-                      class="bg-secondary rounded-circle me-3 d-flex align-items-center justify-content-center"
-                      style="width: 50px; height: 50px"
-                    >
-                      <i class="fas fa-user text-white"></i>
-                    </div>
-                    {% endif %}
-                    <div class="flex-grow-1">
-                      <h6 class="card-title mb-1">{{ utilisateur.first_name }} {{ utilisateur.last_name }}</h6>
-                      <p class="card-text text-muted mb-0">@{{ utilisateur.username }}</p>
-                    </div>
-                    <button class="btn btn-outline-primary btn-sm">Ajouter</button>
-                  </div>
-                </div>
-              </div>
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle"></i>
+                            Aucun utilisateur trouvé pour "{{ query }}".
+                        </div>
+                    {% endif %} {% endif %}
             </div>
-            {% endfor %}
-          </div>
-          {% else %}
-          <div class="alert alert-info" role="alert">
-            <i class="fas fa-info-circle"></i>
-            Aucun utilisateur trouvé pour "{{query }}".
-          </div>
-          {% endif %} {% endif %}
         </div>
-      </div>
     </div>
+{% endblock %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
-  </body>
-</html>
+

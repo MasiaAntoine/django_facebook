@@ -1,0 +1,43 @@
+{% extends "../facebook/base.html" %}
+{% block content %}
+    <div class="container mt-5">
+        <h2>Mon compte</h2>
+
+        <!-- Formulaire de profil -->
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h4>Modifier mes informations</h4>
+            {{ profil_form.non_field_errors }}
+            {% for field in profil_form %}
+                <div class="mb-3">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    <div class="text-danger">{{ field.errors }}</div>
+                </div>
+            {% endfor %}
+            <button type="submit" name="update_profil" class="btn btn-success">Mettre à jour</button>
+        </form>
+
+        <hr>
+
+        <!-- Formulaire de mot de passe -->
+        <form method="post">
+            {% csrf_token %}
+            <h4>Changer mon mot de passe</h4>
+            {{ password_form.non_field_errors }}
+            {% for field in password_form %}
+                <div class="mb-3">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    <div class="text-danger">{{ field.errors }}</div>
+                </div>
+            {% endfor %}
+            <button type="submit" name="update_password" class="btn btn-warning">Changer le mot de passe</button>
+        </form>
+
+        <hr>
+
+        <!-- Lien pour supprimer le compte -->
+        <a href="{% url 'supprimer_compte' %}" class="btn btn-danger">Supprimer mon compte</a>
+    </div>
+{% endblock %}
