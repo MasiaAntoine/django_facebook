@@ -129,8 +129,10 @@ dmypy.json
 .pyre/
 
 # Django specific
+static/*
+!static/logo_app/
+!static/logo_app/*
 media/
-static/
 
 # VS Code
 .vscode/
