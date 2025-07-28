@@ -4,3 +4,4 @@ python-decouple
 django-bootstrap-v5
 psycopg2-binary
 Pillow
+faker

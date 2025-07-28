@@ -10,5 +10,10 @@ echo "✅ Base de données prête !"
 # Commandes Django
 python manage.py makemigrations
 python manage.py migrate
+
+# Exécution du seeder général pour créer les données de test
+python manage.py seed_all
+
 python manage.py create_superuser_if_none_exists
+
 python manage.py runserver 0.0.0.0:8000
