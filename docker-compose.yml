@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   db:
     image: postgres:latest
@@ -34,6 +32,8 @@ services:
       DJANGO_SUPERUSER_PASSWORD: ${SUPERUSER_PASSWORD}
     env_file:
       - .env
+    volumes:
+      - .:/app
 
 volumes:
   postgres_data:
