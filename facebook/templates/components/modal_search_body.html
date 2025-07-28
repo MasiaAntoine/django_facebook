@@ -1,0 +1,7 @@
+<!-- modal_search_body.html -->
+<form method="get" action="{% url 'amis:rechercher_amis' %}" id="searchFriendForm">
+    <div class="input-group">
+        <input type="text" class="form-control" name="q" placeholder="Nom, prénom ou email" required>
+        <button class="btn btn-primary" type="submit">Rechercher</button>
+    </div>
+</form>
