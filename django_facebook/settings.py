@@ -40,6 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 	'core',
     'facebook',
+    'utilisateurs',
+    'amis',
+    'posts',
+    'interactions',
+    'notifications',
 ]
 
 MIDDLEWARE = [
