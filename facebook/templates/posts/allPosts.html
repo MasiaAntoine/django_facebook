@@ -3,7 +3,7 @@
     <h2 class="mb-4">Tous les posts</h2>
 
     {% for post in posts %}
-        <div class="card mb-4 shadow-sm">
+        <div class="card mb-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalPost{{ post.id }}" style="cursor: pointer;">
             <div class="card-header d-flex align-items-center">
                 <!-- Photo profil ou initiale -->
                 <div style="width: 40px; height: 40px; border-radius: 50%; background-color:#007bff; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:18px; margin-right: 12px;">
@@ -34,6 +34,7 @@
                 <p class="card-text">{{ post.description }}</p>
             </div>
         </div>
+        {% include 'components/modal_post_view.html' with post=post %}
     {% empty %}
         <p>Aucun post à afficher.</p>
     {% endfor %}
