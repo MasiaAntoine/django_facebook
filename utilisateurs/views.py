@@ -111,6 +111,9 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 	login_url = reverse_lazy('connexion')
 	
 	def get_context_data(self, **kwargs):
+		from posts.models import Post
 		context = super().get_context_data(**kwargs)
 		context['user_profil'] = self.request.user
+		# Récupérer tous les posts de l'utilisateur connecté, triés par date de création décroissante
+		context['user_posts'] = Post.objects.filter(user=self.request.user).order_by('-created_at')
 		return context
