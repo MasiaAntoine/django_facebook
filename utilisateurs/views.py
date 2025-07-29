@@ -104,3 +104,65 @@ class MonCompteView(LoginRequiredMixin, TemplateView):
 				})
 		
 		return redirect('mon_compte')
+
+
+class ProfilView(LoginRequiredMixin, TemplateView):
+	template_name = 'utilisateurs/profil.html'
+	login_url = reverse_lazy('connexion')
+	
+	def get(self, request, *args, **kwargs):
+		# Récupérer l'ID de l'utilisateur depuis l'URL (optionnel)
+		user_id = kwargs.get('user_id')
+		
+		# Si on accède à son propre profil avec un ID, rediriger vers la page sans ID
+		if user_id and user_id == request.user.id:
+			from django.shortcuts import redirect
+			return redirect('profil')
+		
+		# Si un ID est fourni, vérifier que l'utilisateur existe
+		if user_id:
+			from django.contrib.auth import get_user_model
+			from django.shortcuts import redirect
+			try:
+				get_user_model().objects.get(id=user_id)
+			except get_user_model().DoesNotExist:
+				# Si l'utilisateur n'existe pas, rediriger vers la racine
+				return redirect('home')
+		
+		return super().get(request, *args, **kwargs)
+	
+	def get_context_data(self, **kwargs):
+		from posts.models import Post
+		from django.contrib.auth import get_user_model
+		
+		context = super().get_context_data(**kwargs)
+		
+		# Récupérer l'ID de l'utilisateur depuis l'URL (optionnel)
+		user_id = kwargs.get('user_id')
+		
+		if user_id:
+			# Afficher le profil d'un autre utilisateur (existence déjà vérifiée dans get())
+			user_profil = get_user_model().objects.get(id=user_id)
+			is_own_profile = False
+		else:
+			# Afficher son propre profil
+			user_profil = self.request.user
+			is_own_profile = True
+		
+		context['user_profil'] = user_profil
+		context['is_own_profile'] = is_own_profile
+		
+		# Calculer les statistiques publiques (toujours visibles)
+		total_posts = Post.objects.filter(user=user_profil).count()
+		context['user_stats'] = {
+			'total_posts': total_posts,
+			'member_since': user_profil.date_joined,
+		}
+		
+		# Si ce n'est pas un profil privé OU si c'est son propre profil, afficher les posts
+		if not user_profil.est_privee or is_own_profile:
+			context['user_posts'] = Post.objects.filter(user=user_profil).order_by('-created_at')
+		else:
+			context['user_posts'] = []
+		
+		return context

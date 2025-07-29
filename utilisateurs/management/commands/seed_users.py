@@ -65,8 +65,8 @@ class Command(BaseCommand):
         self.stdout.write('Suppression des utilisateurs existants...')
         User.objects.all().delete()
         
-        # Créer 20 utilisateurs
-        self.stdout.write('Création de 20 utilisateurs avec photos de profil...')
+        # Créer 20 utilisateurs aléatoires
+        self.stdout.write('Création de 20 utilisateurs aléatoires avec photos de profil...')
         users = []
         
         for i in range(20):
@@ -97,6 +97,8 @@ class Command(BaseCommand):
             # Générer un numéro de téléphone plus court
             telephone = fake.numerify('0#########')  # 10 chiffres maximum
             ville = fake.city()
+            # Profil privé aléatoire (30% de chance d'être privé)
+            est_privee = random.choice([True, False, False, False])  # 25% True, 75% False
             
             user = User.objects.create_user(
                 username=username,
@@ -105,7 +107,8 @@ class Command(BaseCommand):
                 first_name=first_name,
                 last_name=last_name,
                 telephone=telephone,
-                ville=ville
+                ville=ville,
+                est_privee=est_privee
             )
             
             # Générer et assigner une photo de profil
@@ -122,8 +125,19 @@ class Command(BaseCommand):
                     self.style.WARNING(f'Erreur création photo pour {username}: {str(e)}')
                 )
             
-            users.append(user)
+            # Afficher le statut du profil
+            status = "privé" if est_privee else "public"
+            self.stdout.write(f'✓ Utilisateur {username} créé (profil {status})')
             
+            users.append(user)
+        
         self.stdout.write(
             self.style.SUCCESS(f'Seeder utilisateurs terminé : {len(users)} utilisateurs créés avec photos de profil')
         )
+        
+        # Statistiques des profils
+        profils_prives = sum(1 for user in users if user.est_privee)
+        profils_publics = len(users) - profils_prives
+        self.stdout.write(f'📊 Statistiques: {profils_publics} profils publics, {profils_prives} profils privés')
+        self.stdout.write('')
+        self.stdout.write('� Pour créer le profil Antoine MASIA, utilisez: python manage.py seed_users_personal')

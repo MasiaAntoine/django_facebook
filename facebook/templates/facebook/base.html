@@ -80,16 +80,43 @@
             </a>
             
             <!-- Mon compte -->
-            <a class="nav-link text-white" href="{% url 'mon_compte' %}">
-                {% if user.photo_profil and user.photo_profil.url %}
-                    <img src="{{ user.photo_profil.url }}" alt="Mon compte" class="rounded-circle"
-                         style="height: 35px; width: 35px; object-fit: cover;">
-                {% else %}
-                    <img src="{% static "default_logo/default.webp" %}" alt="Mon compte"
-                         class="rounded-circle"
-                         style="height: 35px; width: 35px; object-fit: cover;">
-                {% endif %}
-            </a>
+            <div class="dropdown">
+                <button class="nav-link text-white border-0 bg-transparent p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% if user.photo_profil and user.photo_profil.url %}
+                        <img src="{{ user.photo_profil.url }}" alt="Mon compte" class="rounded-circle"
+                             style="height: 35px; width: 35px; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static "default_logo/default.webp" %}" alt="Mon compte"
+                             class="rounded-circle"
+                             style="height: 35px; width: 35px; object-fit: cover;">
+                    {% endif %}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li class="px-3 py-2">
+                        <a href="{% url 'profil' %}" class="text-decoration-none text-dark">
+                            <div class="d-flex align-items-center">
+                                {% if user.photo_profil and user.photo_profil.url %}
+                                    <img src="{{ user.photo_profil.url }}" alt="Photo de profil" class="rounded-circle me-3"
+                                         style="height: 40px; width: 40px; object-fit: cover;">
+                                {% else %}
+                                    <img src="{% static "default_logo/default.webp" %}" alt="Photo de profil"
+                                         class="rounded-circle me-3"
+                                         style="height: 40px; width: 40px; object-fit: cover;">
+                                {% endif %}
+                                <div>
+                                    <div class="fw-bold">{{ user }}</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'mon_compte' %}">
+                            <i class="fas fa-user me-2"></i>Mon compte
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
             <!-- Déconnexion -->
             <a class="nav-link text-white me-2" href="{% url 'deconnexion' %}">

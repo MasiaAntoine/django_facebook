@@ -20,7 +20,10 @@ apps.py
 tests.py
 
 # Ignore Django templates (contains Django template tags)
-*.html
+# *.html
+
+# Comment the above line to allow Prettier to format HTML files
+# But be careful with Django template tags and variables
 
 # Ignore virtual environments
 venv/
