@@ -17,7 +17,10 @@
         "parser": "html",
         "printWidth": 120,
         "tabWidth": 2,
-        "htmlWhitespaceSensitivity": "ignore"
+        "htmlWhitespaceSensitivity": "strict",
+        "bracketSameLine": true,
+        "singleAttributePerLine": false,
+        "embeddedLanguageFormatting": "off"
       }
     },
     {

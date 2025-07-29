@@ -104,3 +104,13 @@ class MonCompteView(LoginRequiredMixin, TemplateView):
 				})
 		
 		return redirect('mon_compte')
+
+
+class ProfilView(LoginRequiredMixin, TemplateView):
+	template_name = 'utilisateurs/profil.html'
+	login_url = reverse_lazy('connexion')
+	
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['user_profil'] = self.request.user
+		return context
