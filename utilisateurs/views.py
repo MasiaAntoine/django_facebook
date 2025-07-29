@@ -152,6 +152,13 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 		context['user_profil'] = user_profil
 		context['is_own_profile'] = is_own_profile
 		
+		# Calculer les statistiques publiques (toujours visibles)
+		total_posts = Post.objects.filter(user=user_profil).count()
+		context['user_stats'] = {
+			'total_posts': total_posts,
+			'member_since': user_profil.date_joined,
+		}
+		
 		# Si ce n'est pas un profil privé OU si c'est son propre profil, afficher les posts
 		if not user_profil.est_privee or is_own_profile:
 			context['user_posts'] = Post.objects.filter(user=user_profil).order_by('-created_at')

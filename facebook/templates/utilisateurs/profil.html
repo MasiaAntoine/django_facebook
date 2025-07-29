@@ -5,12 +5,44 @@ de {{ user_profil.username }}{% endif %} {% endblock %} {% block content %}
 {% include "utilisateurs/profil/header.html" %} {% if user_profil.est_privee and not is_own_profile %}
 <!-- Profil privé -->
 <div class="text-center mt-5">
-  <div class="card shadow-sm mx-auto" style="max-width: 400px;">
+  <div class="card shadow-sm mx-auto" style="max-width: 500px;">
+    <div class="card-header bg-warning text-dark">
+      <h4 class="mb-0"><i class="fas fa-lock me-2"></i>Profil privé</h4>
+    </div>
     <div class="card-body">
-      <i class="fas fa-lock fa-3x text-muted mb-3"></i>
-      <h4 class="card-title">Profil privé</h4>
-      <p class="card-text text-muted">Aucune donnée disponible</p>
-      <small class="text-muted">Ce profil est privé et ses informations ne sont pas visibles.</small>
+      <p class="text-muted mb-4">Ce profil est privé mais voici quelques statistiques :</p>
+
+      <!-- Statistiques publiques -->
+      <div class="row text-center">
+        <div class="col-6">
+          <div class="border-end">
+            <h3 class="text-primary mb-1">{{ user_stats.total_posts }}</h3>
+            <small class="text-muted">Publication{{ user_stats.total_posts|pluralize }}</small>
+          </div>
+        </div>
+        <div class="col-6">
+          <h3 class="text-success mb-1">{{ user_stats.member_since|timesince }}</h3>
+          <small class="text-muted">Membre depuis</small>
+        </div>
+      </div>
+
+      <hr class="my-3" />
+
+      <div class="row text-center">
+        <div class="col-12">
+          <p class="mb-2">
+            <i class="fas fa-calendar-alt me-2 text-muted"></i>
+            <strong>Inscription :</strong> {{ user_stats.member_since|date:"d M Y" }}
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <small class="text-muted">
+          <i class="fas fa-info-circle me-1"></i>
+          Les détails complets ne sont visibles que par le propriétaire du compte.
+        </small>
+      </div>
     </div>
   </div>
 </div>
