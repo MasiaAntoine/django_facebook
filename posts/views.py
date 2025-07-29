@@ -1,3 +1,10 @@
 from django.shortcuts import render
 
-# Create your views here.
+from posts.models import Post
+
+
+def listing_all_posts(request):
+    posts = Post.objects.filter(is_story=False)  # filtrage ici
+    return render(request, "posts/allPosts.html", {
+        "posts": posts,
+    })
