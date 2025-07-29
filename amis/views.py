@@ -10,7 +10,7 @@ def rechercher_amis(request):
     modal_body_search = render_to_string("components/modal_search_body.html", request=request)
     if query:
         utilisateurs = UtilisateurPersonnaliser.objects.filter(
-            Q(first_name__icontains=query) | Q(last_name__icontains=query)
+            Q(first_name__icontains=query) | Q(last_name__icontains=query) | Q(ville__icontains=query)
         ).exclude(id=request.user.id if request.user.is_authenticated else None)
     
     context = {

@@ -27,6 +27,7 @@ class Command(BaseCommand):
             last_name = fake.last_name()
             # Générer un numéro de téléphone plus court
             telephone = fake.numerify('0#########')  # 10 chiffres maximum
+            ville = fake.city()
             
             user = User.objects.create_user(
                 username=username,
@@ -34,7 +35,8 @@ class Command(BaseCommand):
                 password='password123',
                 first_name=first_name,
                 last_name=last_name,
-                telephone=telephone
+                telephone=telephone,
+                ville=ville
             )
             users.append(user)
             
