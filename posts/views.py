@@ -1,10 +1,13 @@
 from django.shortcuts import render
+from django.views.generic import ListView
 
 from posts.models import Post
 
 
-def listing_all_posts(request):
-    posts = Post.objects.filter(is_story=False)  # filtrage ici
-    return render(request, "posts/allPosts.html", {
-        "posts": posts,
-    })
+class ListingAllPostsView(ListView):
+    model = Post
+    template_name = "posts/allPosts.html"
+    context_object_name = "posts"
+    
+    def get_queryset(self):
+        return Post.objects.filter(is_story=False)  # filtrage ici
