@@ -1,8 +1,10 @@
 from django.urls import path
 from . import views
+from .views import CommentaireCreateView, ReactionCreateView
 
 app_name = 'interactions'
 
 urlpatterns = [
-    # URLs pour la gestion des interactions
+	path('commentaire/', CommentaireCreateView.as_view(), name='ajout_commentaire'),
+	path('reaction/', ReactionCreateView.as_view(), name='ajout_reaction'),
 ]
