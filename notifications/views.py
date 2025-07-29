@@ -1,36 +1,45 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import JsonResponse
+from django.views.generic import ListView
+from django.views import View
 from .models import Notification
 
 
-@login_required
-def liste_notifications(request):
+class ListeNotificationsView(LoginRequiredMixin, ListView):
     """Affiche la liste des notifications de l'utilisateur"""
-    notifications = Notification.objects.filter(utilisateur=request.user).order_by('-date')
+    model = Notification
+    template_name = 'notifications/liste.html'
+    context_object_name = 'notifications'
     
-    notifications.filter(lu=False).update(lu=True)
-    
-    return render(request, 'notifications/liste.html', {
-        'notifications': notifications
-    })
+    def get_queryset(self):
+        """Retourne les notifications de l'utilisateur connecté"""
+        queryset = Notification.objects.filter(utilisateur=self.request.user).order_by('-date')
+        queryset.filter(lu=False).update(lu=True)
+        return queryset
 
 
-@login_required
-def marquer_comme_lue(request, notification_id):
+class MarquerCommeLueView(LoginRequiredMixin, View):
     """Marque une notification comme lue"""
-    try:
-        notification = Notification.objects.get(id=notification_id, utilisateur=request.user)
-        notification.lu = True
-        notification.save()
-        return JsonResponse({'success': True})
-    except Notification.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Notification non trouvée'})
+    
+    def post(self, request, notification_id):
+        try:
+            notification = get_object_or_404(
+                Notification, 
+                id=notification_id, 
+                utilisateur=request.user
+            )
+            notification.lu = True
+            notification.save()
+            return JsonResponse({'success': True})
+        except Notification.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Notification non trouvée'})
 
 
-@login_required
-def compter_non_lues(request):
+class CompterNonLuesView(LoginRequiredMixin, View):
     """Retourne le nombre de notifications non lues"""
-    count = Notification.objects.filter(utilisateur=request.user, lu=False).count()
-    return JsonResponse({'count': count})
+    
+    def get(self, request):
+        count = Notification.objects.filter(utilisateur=request.user, lu=False).count()
+        return JsonResponse({'count': count})
