@@ -45,7 +45,11 @@
   {% empty %}
   <div class="text-center py-5">
     <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+    {% if is_own_profile %}
     <p class="text-muted">Vous n'avez encore publié aucun post.</p>
+    {% else %}
+    <p class="text-muted">{{ user_profil.username }} n'a rien posté.</p>
+    {% endif %}
   </div>
   {% endfor %}
 </div>

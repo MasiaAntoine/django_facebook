@@ -24,10 +24,12 @@
     </div>
   </div>
 
+  {% if is_own_profile %}
   <div class="d-flex gap-2">
     <button class="btn btn-primary"> <i class="fas fa-plus me-2"></i>Ajouter à la story </button>
     <a href="{% url 'mon_compte' %}" class="btn btn-outline-primary">
       <i class="fas fa-edit me-2"></i>Modifier le profil
     </a>
   </div>
+  {% endif %}
 </div>

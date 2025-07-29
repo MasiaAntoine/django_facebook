@@ -9,4 +9,5 @@ urlpatterns = [
 	path('supprimer/', SupprimerCompteView.as_view(), name='supprimer_compte'),
 	path('mon_compte/', MonCompteView.as_view(), name='mon_compte'),
 	path('profil/', ProfilView.as_view(), name='profil'),
+	path('profil/<int:user_id>/', ProfilView.as_view(), name='profil_user'),
 ]
