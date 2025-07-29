@@ -20,3 +20,18 @@ class Notification(models.Model):
 
 	def __str__(self):
 		return f"Notif {self.type} de {self.emetteur} à {self.utilisateur}"
+
+	@classmethod
+	def creer_notification(cls, utilisateur, emetteur, type_notif, message):
+		"""Méthode utilitaire pour créer une notification"""
+		if utilisateur != emetteur:
+			return cls.objects.create(
+				utilisateur=utilisateur,
+				emetteur=emetteur,
+				type=type_notif,
+				message=message
+			)
+		return None
+
+	class Meta:
+		ordering = ['-date']

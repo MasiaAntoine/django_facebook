@@ -32,10 +32,10 @@ class Command(BaseCommand):
         notif_types = ['like', 'comment', 'friend_request', 'share']
         
         messages_templates = {
-            'like': '{emetteur} a aimé votre publication',
-            'comment': '{emetteur} a commenté votre publication',
-            'friend_request': '{emetteur} vous a envoyé une demande d\'ami',
-            'share': '{emetteur} a partagé votre publication'
+            'like': 'a aimé votre publication',
+            'comment': 'a commenté votre publication',
+            'friend_request': 'vous a envoyé une demande d\'ami',
+            'share': 'a partagé votre publication'
         }
         
         for i in range(60):
