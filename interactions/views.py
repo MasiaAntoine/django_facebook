@@ -9,7 +9,7 @@ from posts.models import Post
 class CommentaireCreateView(LoginRequiredMixin, CreateView):
 	model = Commentaire
 	login_url = '/utilisateurs/connexion/'
-	fields = ['contenu']  # On gère les champs 'post' et 'user' dans form_valid
+	fields = ['contenu']
 	http_method_names = ['post']
 
 	def form_valid(self, form):

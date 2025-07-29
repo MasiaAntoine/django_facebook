@@ -16,7 +16,6 @@ class HomeView(TemplateView):
 		modal_body_search = render_to_string("components/modal_search_body.html", request=self.request)
 		posts = Post.objects.filter(is_story=False)
 
-		# Regroupement des réactions par post et type, avec compte
 		grouped_reactions = (
 			Reaction.objects
 			.filter(post__in=posts)
@@ -28,7 +27,6 @@ class HomeView(TemplateView):
 			"modal_body_search": modal_body_search,
 			"posts": posts,
 			"grouped_reactions": grouped_reactions,
-			# Si tu utilises aussi une liste types/emoji dans le template
 			"reaction_types": [
 				{'type': 'like', 'emoji': '👍'},
 				{'type': 'love', 'emoji': '❤️'},
