@@ -1,13 +1,62 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
 from faker import Faker
 import random
+from PIL import Image, ImageDraw, ImageFont
+import io
+import os
 
 User = get_user_model()
 
 
 class Command(BaseCommand):
     help = 'Seeder pour créer des utilisateurs de test'
+
+    def generate_profile_picture(self, first_name, last_name, size=200):
+        """Génère une image de profil avec les initiales de l'utilisateur"""
+        # Couleurs aléatoires pour l'arrière-plan
+        colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+            '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+        ]
+        bg_color = random.choice(colors)
+        
+        # Créer une image avec arrière-plan coloré
+        image = Image.new('RGB', (size, size), bg_color)
+        draw = ImageDraw.Draw(image)
+        
+        # Obtenir les initiales
+        initials = (first_name[0] + last_name[0]).upper()
+        
+        # Essayer de charger une police, sinon utiliser la police par défaut
+        try:
+            font_size = size // 3
+            font = ImageFont.truetype("/System/Library/Fonts/Arial.ttf", font_size)
+        except:
+            try:
+                font_size = size // 3
+                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", font_size)
+            except:
+                font = ImageFont.load_default()
+        
+        # Calculer la position du texte pour le centrer
+        bbox = draw.textbbox((0, 0), initials, font=font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+        
+        x = (size - text_width) // 2
+        y = (size - text_height) // 2
+        
+        # Dessiner le texte
+        draw.text((x, y), initials, fill='white', font=font)
+        
+        # Convertir en bytes
+        img_io = io.BytesIO()
+        image.save(img_io, format='PNG')
+        img_io.seek(0)
+        
+        return ContentFile(img_io.getvalue(), name=f'{first_name}_{last_name}_profile.png')
 
     def handle(self, *args, **options):
         fake = Faker('fr_FR')
@@ -17,14 +66,34 @@ class Command(BaseCommand):
         User.objects.all().delete()
         
         # Créer 20 utilisateurs
-        self.stdout.write('Création de 20 utilisateurs...')
+        self.stdout.write('Création de 20 utilisateurs avec photos de profil...')
         users = []
         
         for i in range(20):
-            username = f"user_{i+1}"
-            email = fake.email()
             first_name = fake.first_name()
             last_name = fake.last_name()
+            
+            # Générer un pseudo réaliste
+            username_options = [
+                f"{first_name.lower()}.{last_name.lower()}",
+                f"{first_name.lower()}{last_name.lower()}",
+                f"{first_name.lower()}_{last_name.lower()}",
+                f"{first_name.lower()}{random.randint(10, 99)}",
+                f"{last_name.lower()}{first_name[0].lower()}",
+                f"{first_name[0].lower()}.{last_name.lower()}",
+                f"{first_name.lower()}_{random.randint(1990, 2005)}",
+                f"{last_name.lower()}.{first_name[0].lower()}"
+            ]
+            
+            # Choisir un pseudo et s'assurer qu'il est unique
+            username = random.choice(username_options)
+            counter = 1
+            original_username = username
+            while User.objects.filter(username=username).exists():
+                username = f"{original_username}{counter}"
+                counter += 1
+            
+            email = fake.email()
             # Générer un numéro de téléphone plus court
             telephone = fake.numerify('0#########')  # 10 chiffres maximum
             ville = fake.city()
@@ -38,8 +107,23 @@ class Command(BaseCommand):
                 telephone=telephone,
                 ville=ville
             )
+            
+            # Générer et assigner une photo de profil
+            try:
+                profile_picture = self.generate_profile_picture(first_name, last_name)
+                user.photo_profil.save(
+                    f'{username}_profile.png',
+                    profile_picture,
+                    save=True
+                )
+                self.stdout.write(f'✓ Photo créée pour {username}')
+            except Exception as e:
+                self.stdout.write(
+                    self.style.WARNING(f'Erreur création photo pour {username}: {str(e)}')
+                )
+            
             users.append(user)
             
         self.stdout.write(
-            self.style.SUCCESS(f'Seeder utilisateurs terminé : {len(users)} utilisateurs créés')
+            self.style.SUCCESS(f'Seeder utilisateurs terminé : {len(users)} utilisateurs créés avec photos de profil')
         )
