@@ -65,8 +65,8 @@ class Command(BaseCommand):
         self.stdout.write('Suppression des utilisateurs existants...')
         User.objects.all().delete()
         
-        # Créer 20 utilisateurs
-        self.stdout.write('Création de 20 utilisateurs avec photos de profil...')
+        # Créer 20 utilisateurs aléatoires
+        self.stdout.write('Création de 20 utilisateurs aléatoires avec photos de profil...')
         users = []
         
         for i in range(20):
@@ -139,3 +139,5 @@ class Command(BaseCommand):
         profils_prives = sum(1 for user in users if user.est_privee)
         profils_publics = len(users) - profils_prives
         self.stdout.write(f'📊 Statistiques: {profils_publics} profils publics, {profils_prives} profils privés')
+        self.stdout.write('')
+        self.stdout.write('� Pour créer le profil Antoine MASIA, utilisez: python manage.py seed_users_personal')
