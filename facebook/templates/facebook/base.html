@@ -8,6 +8,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
+      /* Retirer la flèche du dropdown Bootstrap */
+      .dropdown-toggle::after {
+          display: none !important;
+      }
       .search-bg {
           background-color: rgba(255, 255, 255, 0.2);
           border-radius: 10px;
@@ -21,6 +25,11 @@
       .nav-link.active {
           background-color: rgba(255, 255, 255, 0.3);
           border-radius: 8px;
+      }
+
+      /* Correction pour dropdown Bootstrap qui ne s'affiche pas */
+      .dropdown-menu {
+          z-index: 1050 !important;
       }
     </style>
   </head>
@@ -46,7 +55,7 @@
             <i class="fas fa-search"></i>
             <span class="ms-1 d-none d-sm-inline">Rechercher des amis</span>
           </button>
-          <!-- prettier-ignore -->
+          
           {% include "components/modal.html" with modal_id="searchModal" modal_title="Rechercher un ami" modal_body=modal_body_search modal_footer="" %}
         </div>
       </div>
@@ -57,6 +66,12 @@
           class="nav-link text-white p-2 {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
           href="{% url 'home' %}">
           <i class="fa-solid fa-house"></i>
+        </a>
+
+        <!-- Utilisateurs (icône users) -->
+        <a
+          class="nav-link text-white p-2 {% if request.path == '/utilisateurs/profil/' %}active{% endif %}" href="/utilisateurs/profil/#amis">
+          <i class="fas fa-users"></i>
         </a>
 
         <!-- Amis  -->
@@ -79,7 +94,6 @@
         <!-- Notifications -->
         <a class="nav-link text-white p-2 position-relative" href="{% url 'notifications:liste' %}">
           <i class="fa-solid fa-bell"></i>
-          <!-- Badge pour le nombre de notifications non lues -->
           <span
             id="notification-badge"
             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
@@ -90,7 +104,7 @@
         <!-- Mon compte -->
         <div class="dropdown">
           <button
-            class="nav-link text-white border-0 bg-transparent p-0"
+            class="dropdown-toggle text-white border-0 bg-transparent p-0"
             type="button"
             data-bs-toggle="dropdown"
             aria-expanded="false">
@@ -178,6 +192,21 @@
 
       // Actualiser le compteur toutes les 30 secondes
       setInterval(loadNotificationCount, 30000);
+
+      // Correction pour dropdown qui ne s'ouvre pas sur la page profil
+      document.addEventListener('DOMContentLoaded', function() {
+        var dropdownBtn = document.querySelector('.dropdown-toggle[data-bs-toggle="dropdown"]');
+        var dropdownMenu = document.querySelector('.dropdown-menu');
+        if (dropdownBtn && dropdownMenu) {
+          dropdownBtn.addEventListener('click', function(e) {
+            setTimeout(function() {
+              if (!dropdownMenu.classList.contains('show')) {
+                dropdownMenu.classList.add('show');
+              }
+            }, 50);
+          });
+        }
+      });
     </script>
     {% endif %} {% endblock %}
   </body>
