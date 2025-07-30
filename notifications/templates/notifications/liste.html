@@ -19,24 +19,28 @@
                             <div class="notification-item border-bottom p-3 {% if not notification.lu %}bg-light{% endif %}">
                                 <div class="d-flex align-items-start">
                                     <div class="me-3">
-                                        {% if notification.emetteur.photo_profil %}
-                                            <img src="{{ notification.emetteur.photo_profil.url }}" 
-                                                 alt="{{ notification.emetteur.get_full_name }}"
-                                                 class="rounded-circle"
-                                                 style="width: 40px; height: 40px; object-fit: cover;">
-                                        {% else %}
-                                            <img src="{% static 'default_logo/default.webp' %}" 
-                                                 alt="{{ notification.emetteur.get_full_name }}"
-                                                 class="rounded-circle"
-                                                 style="width: 40px; height: 40px; object-fit: cover;">
-                                        {% endif %}
+                                        <a href="{% url 'profil_user' notification.emetteur.id %}" style="text-decoration: none;">
+                                            {% if notification.emetteur.photo_profil %}
+                                                <img src="{{ notification.emetteur.photo_profil.url }}" 
+                                                     alt="{{ notification.emetteur.get_full_name }}"
+                                                     class="rounded-circle"
+                                                     style="width: 40px; height: 40px; object-fit: cover;">
+                                            {% else %}
+                                                <img src="{% static 'default_logo/default.webp' %}" 
+                                                     alt="{{ notification.emetteur.get_full_name }}"
+                                                     class="rounded-circle"
+                                                     style="width: 40px; height: 40px; object-fit: cover;">
+                                            {% endif %}
+                                        </a>
                                     </div>
                                     
                                     <div class="flex-grow-1">
                                         <div class="d-flex justify-content-between align-items-start">
                                             <div>
                                                 <p class="mb-1">
-                                                    <strong>{{ notification.emetteur.get_full_name }}</strong>
+                                                    <a href="{% url 'profil_user' notification.emetteur.id %}" style="text-decoration: none; color: inherit;">
+                                                        <strong>{{ notification.emetteur.get_full_name }}</strong>
+                                                    </a>
                                                     {{ notification.message }}
                                                 </p>
                                                 <small class="text-muted">
