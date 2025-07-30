@@ -193,6 +193,31 @@
       // Actualiser le compteur toutes les 30 secondes
       setInterval(loadNotificationCount, 30000);
 
+      // Forcer l'activation de l'onglet "Amis" si on clique sur l'icône amis même déjà sur profil
+      document.addEventListener('DOMContentLoaded', function() {
+        var amisLink = document.querySelector('a[href="/utilisateurs/profil/#amis"]');
+        if (amisLink) {
+          amisLink.addEventListener('click', function(e) {
+            if (window.location.pathname === '/utilisateurs/profil/') {
+              setTimeout(function () {
+                var amisTab = document.getElementById('amis-tab');
+                var amisPane = document.getElementById('amis');
+                if (amisTab && amisPane && !amisPane.classList.contains('show')) {
+                  if (!amisTab.getAttribute('data-bs-toggle')) {
+                    amisTab.setAttribute('data-bs-toggle', 'tab');
+                  }
+                  if (window.bootstrap && bootstrap.Tab) {
+                    var tab = new bootstrap.Tab(amisTab);
+                    tab.show();
+                  } else {
+                    amisTab.dispatchEvent(new MouseEvent('click', {bubbles:true}));
+                  }
+                }
+              }, 100);
+            }
+          });
+        }
+      });
       // Correction pour dropdown qui ne s'ouvre pas sur la page profil
       document.addEventListener('DOMContentLoaded', function() {
         var dropdownBtn = document.querySelector('.dropdown-toggle[data-bs-toggle="dropdown"]');
