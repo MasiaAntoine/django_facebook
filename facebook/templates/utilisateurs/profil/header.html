@@ -33,29 +33,39 @@
         <i class="fas fa-edit me-2"></i>Modifier le profil
       </a>
     {% else %}
-      {% if est_ami %}
-        <div class="d-flex gap-2">
-          <span class="btn btn-success disabled" style="pointer-events: none; opacity: 0.8;">
-            <i class="fas fa-user-friends me-2"></i>Vous êtes amis
-          </span>
-          <form method="post" action="{% url 'amis:action_ami' 'supprimer' user_profil.id %}" onsubmit="return confirm('Voulez-vous vraiment supprimer cet ami ?');">
+      {% if not est_bloque and not est_bloque_par %}
+        {% if est_ami %}
+          <div class="d-flex gap-2">
+            <span class="btn btn-success disabled" style="pointer-events: none; opacity: 0.8;">
+              <i class="fas fa-user-friends me-2"></i>Vous êtes amis
+            </span>
+            <form method="post" action="{% url 'amis:action_ami' 'supprimer' user_profil.id %}" onsubmit="return confirm('Voulez-vous vraiment supprimer cet ami ?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger"><i class="fas fa-user-minus me-2"></i>Supprimer des amis</button>
+            </form>
+          </div>
+        {% elif demande_envoyee %}
+          <button class="btn btn-secondary" disabled><i class="fas fa-hourglass-half me-2"></i>Demande envoyée</button>
+        {% elif demande_recue %}
+          <form method="post" action="{% url 'amis:action_ami' 'accepter' user_profil.id %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger"><i class="fas fa-user-minus me-2"></i>Supprimer des amis</button>
+            <button type="submit" class="btn btn-success"><i class="fas fa-user-check me-2"></i>Accepter en ami</button>
           </form>
-        </div>
-      {% elif demande_envoyee %}
-        <button class="btn btn-secondary" disabled><i class="fas fa-hourglass-half me-2"></i>Demande envoyée</button>
-      {% elif demande_recue %}
-        <form method="post" action="{% url 'amis:action_ami' 'accepter' user_profil.id %}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-success"><i class="fas fa-user-check me-2"></i>Accepter en ami</button>
-        </form>
-      {% else %}
-        <form method="post" action="{% url 'amis:action_ami' 'ajouter' user_profil.id %}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-primary"><i class="fas fa-user-plus me-2"></i>Ajouter en ami</button>
-        </form>
+        {% else %}
+          <form method="post" action="{% url 'amis:action_ami' 'ajouter' user_profil.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary"><i class="fas fa-user-plus me-2"></i>Ajouter en ami</button>
+          </form>
+        {% endif %}
       {% endif %}
+      <form method="post" action="{% url 'bloquer_user' user_profil.id %}" style="display:inline;">
+        {% csrf_token %}
+        {% if est_bloque %}
+          <button type="submit" class="btn btn-warning"><i class="fas fa-unlock me-2"></i>Débloquer</button>
+        {% else %}
+          <button type="submit" class="btn btn-danger"><i class="fas fa-ban me-2"></i>Bloquer</button>
+        {% endif %}
+      </form>
     {% endif %}
   </div>
 </div>

@@ -1,6 +1,6 @@
 # utilisateurs/urls.py
 from django.urls import path
-from .views import InscriptionView, ConnexionView, DeconnexionView, SupprimerCompteView, MonCompteView, ProfilView
+from .views import InscriptionView, ConnexionView, DeconnexionView, SupprimerCompteView, MonCompteView, ProfilView, ActionBloquerView
 
 urlpatterns = [
 	path('inscription/', InscriptionView.as_view(), name='inscription'),
@@ -10,4 +10,5 @@ urlpatterns = [
 	path('mon_compte/', MonCompteView.as_view(), name='mon_compte'),
 	path('profil/', ProfilView.as_view(), name='profil'),
 	path('profil/<int:user_id>/', ProfilView.as_view(), name='profil_user'),
+	path('profil/<int:user_id>/bloquer/', ActionBloquerView.as_view(), name='bloquer_user'),
 ]

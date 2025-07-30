@@ -6,9 +6,13 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import FormView, TemplateView
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
+from django.http import HttpResponseForbidden
 
 from utilisateurs.forms import InscriptionForm, ConnexionForm, ProfilForm, CustomPasswordChangeForm
+from amis.models import Ami
+from django.db.models import Q
 
 
 class InscriptionView(FormView):
@@ -111,26 +115,24 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 	login_url = reverse_lazy('connexion')
 	
 	def get(self, request, *args, **kwargs):
-		# Récupérer l'ID de l'utilisateur depuis l'URL (optionnel)
 		user_id = kwargs.get('user_id')
-		
-		# Si on accède à son propre profil avec un ID, rediriger vers la page sans ID
 		if user_id and user_id == request.user.id:
 			from django.shortcuts import redirect
 			return redirect('profil')
-		
-		# Si un ID est fourni, vérifier que l'utilisateur existe
 		if user_id:
 			from django.contrib.auth import get_user_model
 			from django.shortcuts import redirect
 			try:
-				get_user_model().objects.get(id=user_id)
+				user_profil = get_user_model().objects.get(id=user_id)
 			except get_user_model().DoesNotExist:
-				# Si l'utilisateur n'existe pas, rediriger vers la racine
 				return redirect('home')
-		
+			# Vérifier si l'utilisateur courant est bloqué par user_profil
+			if Ami.is_blocked(request.user, user_profil):
+				self.only_block_message = True
+				self.blocked_by = user_profil
+				return super().get(request, *args, **kwargs)
 		return super().get(request, *args, **kwargs)
-	
+
 	def get_context_data(self, **kwargs):
 		from posts.models import Post
 		from django.contrib.auth import get_user_model
@@ -138,18 +140,21 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 		from django.db.models import Q
 
 		context = super().get_context_data(**kwargs)
-
-		# Récupérer l'ID de l'utilisateur depuis l'URL (optionnel)
 		user_id = kwargs.get('user_id')
 
 		if user_id:
-			# Afficher le profil d'un autre utilisateur (existence déjà vérifiée dans get())
+			from django.contrib.auth import get_user_model
 			user_profil = get_user_model().objects.get(id=user_id)
 			is_own_profile = False
 		else:
-			# Afficher son propre profil
 			user_profil = self.request.user
 			is_own_profile = True
+
+		# Si l'utilisateur courant est bloqué par user_profil, afficher uniquement le message
+		if hasattr(self, 'only_block_message') and getattr(self, 'only_block_message', False):
+			context['blocked_by'] = self.blocked_by
+			context['only_block_message'] = True
+			return context
 
 		context['user_profil'] = user_profil
 		context['is_own_profile'] = is_own_profile
@@ -195,11 +200,17 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 
 		context['amis'] = amis
 
+		# Ajout pour bouton bloquer/débloquer
+		est_bloque = Ami.objects.filter(demandeur=self.request.user, receveur=user_profil, bloquer=True).exists() if not is_own_profile else False
+		est_bloque_par = Ami.objects.filter(demandeur=user_profil, receveur=self.request.user, bloquer=True).exists() if not is_own_profile else False
+		context['est_bloque'] = est_bloque
+		context['est_bloque_par'] = est_bloque_par
+
 		# --- Ajout pour bouton ami ---
 		est_ami = False
 		demande_envoyee = False
 		demande_recue = False
-		if not is_own_profile:
+		if not is_own_profile and not est_bloque and not est_bloque_par:
 			# Vérifie si une relation d'amitié existe dans les deux sens et acceptée
 			est_ami = Ami.objects.filter(
 				(
@@ -230,3 +241,39 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 			context['user_posts'] = []
 
 		return context
+
+
+# --- Vue pour bloquer/débloquer un utilisateur ---
+class ActionBloquerView(LoginRequiredMixin, View):
+	@method_decorator(csrf_protect)
+	def post(self, request, user_id):
+		from django.contrib.auth import get_user_model
+		User = get_user_model()
+		try:
+			cible = User.objects.get(id=user_id)
+		except User.DoesNotExist:
+			return redirect('home')
+		if cible == request.user:
+			return redirect('profil')
+		ami_relation = Ami.objects.filter(
+			Q(demandeur=request.user, receveur=cible) | Q(demandeur=cible, receveur=request.user)
+		).first()
+		if ami_relation:
+			if ami_relation.demandeur == request.user and ami_relation.bloquer:
+				ami_relation.bloquer = False
+				ami_relation.save()
+			else:
+				ami_relation.demandeur = request.user
+				ami_relation.receveur = cible
+				ami_relation.bloquer = True
+				ami_relation.accepter = False
+				ami_relation.save()
+		else:
+			Ami.objects.create(demandeur=request.user, receveur=cible, bloquer=True)
+		Ami.objects.filter(
+			Q(demandeur=request.user, receveur=cible) | Q(demandeur=cible, receveur=request.user),
+			accepter=True
+		).update(accepter=False)
+		messages.success(request, "Action de blocage/déblocage effectuée.")
+  
+		return redirect('profil_user', user_id=cible.id)
