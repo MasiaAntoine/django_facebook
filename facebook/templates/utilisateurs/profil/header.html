@@ -20,7 +20,9 @@
     <div class="ms-3 d-flex flex-column justify-content-center">
       <h2 class="card-text">{{ user_profil.first_name }} {{ user_profil.last_name }}</h2>
 
-      <p class="card-text"><i class="fas fa-at me-2"></i>{{ user_profil.username }}</p>
+      <p class="card-text m-0"><i class="fas fa-at me-2"></i>{{ user_profil.username }}</p>
+      <p class="card-text m-0"><i class="fas fa-user-friends me-2"></i>{{ amis|length }} ami{% if amis|length > 1 %}s{% endif %}</p>
+
     </div>
   </div>
 
