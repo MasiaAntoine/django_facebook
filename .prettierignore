@@ -1,23 +1,4 @@
-# Ignore Python files
-*.py
-*.pyc
-*.pyo
-*.pyd
-__pycache__/
-*.egg-info/
-
-# Ignore Django specific files
-**/migrations/
-manage.py
-settings.py
-wsgi.py
-asgi.py
-urls.py
-models.py
-views.py
-admin.py
-apps.py
-tests.py
+*
 
 # Ignore Django templates (contains Django template tags)
 # *.html

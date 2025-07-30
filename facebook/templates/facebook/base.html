@@ -1,178 +1,238 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-        .search-bg {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-        }
+      /* Retirer la flèche du dropdown Bootstrap */
+      .dropdown-toggle::after {
+          display: none !important;
+      }
+      .search-bg {
+          background-color: rgba(255, 255, 255, 0.2);
+          border-radius: 10px;
+      }
 
-        .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-        }
+      .nav-link:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+          border-radius: 8px;
+      }
 
-        .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-        }
+      .nav-link.active {
+          background-color: rgba(255, 255, 255, 0.3);
+          border-radius: 8px;
+      }
+
+      /* Correction pour dropdown Bootstrap qui ne s'affiche pas */
+      .dropdown-menu {
+          z-index: 1050 !important;
+      }
     </style>
-</head>
-<body>
-
-<!-- Navbar -->
-<div class="bg-primary d-flex justify-content-between px-2 px-md-4 py-2 py-md-3">
-    <div class="d-flex align-items-center gap-2 gap-lg-4">
+  </head>
+  <body>
+    <!-- Navbar -->
+    <div class="bg-primary d-flex justify-content-between px-2 px-md-4 py-2 py-md-3">
+      <div class="d-flex align-items-center gap-2 gap-lg-4">
         <!-- Logo -->
         <a class="navbar-brand d-flex align-items-center ms-2" href="{% url 'home' %}">
-            <img src="{% static 'logo_app/960x960.png' %}" alt="Logo Facebook"
-                 style="height: 40px; object-fit: contain;" class="me-2 rounded-circle"/>
+          <img
+            src="{% static 'logo_app/960x960.png' %}"
+            alt="Logo Facebook"
+            style="height: 40px; object-fit: contain;"
+            class="me-2 rounded-circle" />
         </a>
 
         <!-- Recherche amis -->
         <div class="search-bg px-2 py-1">
-            <button class="nav-link text-white p-0 d-flex align-items-center" data-bs-toggle="modal"
-                    data-bs-target="#searchModal">
-                <i class="fas fa-search"></i>
-                <span class="ms-1 d-none d-sm-inline">Rechercher des amis</span>
-            </button>
-            {% include "components/modal.html" with modal_id="searchModal" modal_title="Rechercher un ami" modal_body=modal_body_search modal_footer="" %}
-
+          <button
+            class="nav-link text-white p-0 d-flex align-items-center"
+            data-bs-toggle="modal"
+            data-bs-target="#searchModal">
+            <i class="fas fa-search"></i>
+            <span class="ms-1 d-none d-sm-inline">Rechercher des amis</span>
+          </button>
+          
+          {% include "components/modal.html" with modal_id="searchModal" modal_title="Rechercher un ami" modal_body=modal_body_search modal_footer="" %}
         </div>
-    </div>
+      </div>
 
-    <div class="d-flex align-items-center gap-2 gap-lg-3">
+      <div class="d-flex align-items-center gap-2 gap-lg-3">
         <!-- Accueil -->
-        <a class="nav-link text-white p-2 {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
-           href="{% url 'home' %}">
-            <i class="fa-solid fa-house"></i>
+        <a
+          class="nav-link text-white p-2 {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+          href="{% url 'home' %}">
+          <i class="fa-solid fa-house"></i>
         </a>
 
-        <!-- Amis -->
-        <a class="nav-link text-white p-2 {% if request.resolver_match.url_name == 'rechercher_amis' %}active{% endif %}"
-           href="{% url 'amis:rechercher_amis' %}">
-            <i class="fa-solid fa-people-group"></i>
+        <!-- Utilisateurs (icône users) -->
+        <a
+          class="nav-link text-white p-2 {% if request.path == '/utilisateurs/profil/' %}active{% endif %}" href="/utilisateurs/profil/#amis">
+          <i class="fas fa-users"></i>
+        </a>
+
+        <!-- Amis  -->
+        <a
+          class="nav-link text-white p-2 {% if request.resolver_match.url_name == 'rechercher_amis' %}active{% endif %}"
+          href="{% url 'amis:rechercher_amis' %}">
+          <i class="fas fa-search"></i>
         </a>
 
         <!-- Superuser config -->
         {% if user.is_superuser %}
-            <a class="nav-link text-white p-2" href="/admin/">
-                <i class="fa-solid fa-screwdriver-wrench"></i>
-            </a>
+        <a class="nav-link text-white p-2" href="/admin/">
+          <i class="fa-solid fa-screwdriver-wrench"></i>
+        </a>
         {% endif %}
-    </div>
+      </div>
 
-    <div class="d-flex align-items-center gap-2">
+      <div class="d-flex align-items-center gap-2">
         {% if user.is_authenticated %}
-            <!-- Notifications -->
-            <a class="nav-link text-white p-2 position-relative" href="{% url 'notifications:liste' %}">
-                <i class="fa-solid fa-bell"></i>
-                <!-- Badge pour le nombre de notifications non lues -->
-                <span id="notification-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
-                    0
-                </span>
-            </a>
-            
-            <!-- Mon compte -->
-            <div class="dropdown">
-                <button class="nav-link text-white border-0 bg-transparent p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {% if user.photo_profil and user.photo_profil.url %}
-                        <img src="{{ user.photo_profil.url }}" alt="Mon compte" class="rounded-circle"
-                             style="height: 35px; width: 35px; object-fit: cover;">
-                    {% else %}
-                        <img src="{% static "default_logo/default.webp" %}" alt="Mon compte"
-                             class="rounded-circle"
-                             style="height: 35px; width: 35px; object-fit: cover;">
-                    {% endif %}
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li class="px-3 py-2">
-                        <a href="{% url 'profil' %}" class="text-decoration-none text-dark">
-                            <div class="d-flex align-items-center">
-                                {% if user.photo_profil and user.photo_profil.url %}
-                                    <img src="{{ user.photo_profil.url }}" alt="Photo de profil" class="rounded-circle me-3"
-                                         style="height: 40px; width: 40px; object-fit: cover;">
-                                {% else %}
-                                    <img src="{% static "default_logo/default.webp" %}" alt="Photo de profil"
-                                         class="rounded-circle me-3"
-                                         style="height: 40px; width: 40px; object-fit: cover;">
-                                {% endif %}
-                                <div>
-                                    <div class="fw-bold">{{ user }}</div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <a class="dropdown-item" href="{% url 'mon_compte' %}">
-                            <i class="fas fa-user me-2"></i>Mon compte
-                        </a>
-                    </li>
-                </ul>
-            </div>
+        <!-- Notifications -->
+        <a class="nav-link text-white p-2 position-relative" href="{% url 'notifications:liste' %}">
+          <i class="fa-solid fa-bell"></i>
+          <span
+            id="notification-badge"
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+            0
+          </span>
+        </a>
 
-            <!-- Déconnexion -->
-            <a class="nav-link text-white me-2" href="{% url 'deconnexion' %}">
-                <i class="fas fa-sign-out-alt"></i>
-            </a>
+        <!-- Mon compte -->
+        <div class="dropdown">
+          <button
+            class="dropdown-toggle text-white border-0 bg-transparent p-0"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
+            {% if user.photo_profil and user.photo_profil.url %}
+            <img
+              src="{{ user.photo_profil.url }}"
+              alt="Mon compte"
+              class="rounded-circle"
+              style="height: 35px; width: 35px; object-fit: cover;" />
+            {% else %} <img src="{% static "default_logo/default.webp" %}" alt="Mon compte" class="rounded-circle"
+            style="height: 35px; width: 35px; object-fit: cover;"> {% endif %}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li class="px-3 py-2">
+              <a href="{% url 'profil' %}" class="text-decoration-none text-dark">
+                <div class="d-flex align-items-center">
+                  {% if user.photo_profil and user.photo_profil.url %}
+                  <img
+                    src="{{ user.photo_profil.url }}"
+                    alt="Photo de profil"
+                    class="rounded-circle me-3"
+                    style="height: 40px; width: 40px; object-fit: cover;" />
+                  {% else %} <img src="{% static "default_logo/default.webp" %}" alt="Photo de profil"
+                  class="rounded-circle me-3" style="height: 40px; width: 40px; object-fit: cover;"> {% endif %}
+                  <div>
+                    <div class="fw-bold">{{ user }}</div>
+                  </div>
+                </div>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item" href="{% url 'mon_compte' %}"> <i class="fas fa-user me-2"></i>Mon compte </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Déconnexion -->
+        <a class="nav-link text-white me-2" href="{% url 'deconnexion' %}">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
         {% else %}
-            <!-- Connexion -->
-            <a class="nav-link text-white me-2" href="{% url 'connexion' %}">
-                <i class="fas fa-sign-in-alt"></i>
-            </a>
+        <!-- Connexion -->
+        <a class="nav-link text-white me-2" href="{% url 'connexion' %}">
+          <i class="fas fa-sign-in-alt"></i>
+        </a>
         {% endif %}
+      </div>
     </div>
-</div>
 
-<!-- Contenu principal -->
-<main class="container mt-4" style="min-height: 75.5vh;">
-    {% block content %}{% endblock %}
-</main>
+    <!-- Contenu principal -->
+    <main class="container mt-4" style="min-height: 75.5vh;"> {% block content %}{% endblock %} </main>
 
-<!-- Footer -->
-<footer class="bg-dark text-white py-4 mt-5">
-    <div class="container text-center">
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+      <div class="container text-center">
         <p class="mb-0">&copy; 2025 Dépôt de candidatures. Tous droits réservés.</p>
-    </div>
-</footer>
+      </div>
+    </footer>
 
-<!-- Scripts -->
-{% block javascript %}
+    <!-- Scripts -->
+    {% block javascript %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     {% if user.is_authenticated %}
     <script>
-        // Fonction pour charger le nombre de notifications non lues
-        function loadNotificationCount() {
-            fetch('{% url "notifications:compter_non_lues" %}')
-                .then(response => response.json())
-                .then(data => {
-                    const badge = document.getElementById('notification-badge');
-                    if (data.count > 0) {
-                        badge.textContent = data.count > 99 ? '99+' : data.count;
-                        badge.classList.remove('d-none');
-                    } else {
-                        badge.classList.add('d-none');
-                    }
-                })
-                .catch(error => console.error('Erreur lors du chargement des notifications:', error));
+      // Fonction pour charger le nombre de notifications non lues
+      function loadNotificationCount() {
+          fetch('{% url "notifications:compter_non_lues" %}')
+              .then(response => response.json())
+              .then(data => {
+                  const badge = document.getElementById('notification-badge');
+                  if (data.count > 0) {
+                      badge.textContent = data.count > 99 ? '99+' : data.count;
+                      badge.classList.remove('d-none');
+                  } else {
+                      badge.classList.add('d-none');
+                  }
+              })
+              .catch(error => console.error('Erreur lors du chargement des notifications:', error));
+      }
+
+      // Charger le compteur au chargement de la page
+      document.addEventListener('DOMContentLoaded', loadNotificationCount);
+
+      // Actualiser le compteur toutes les 30 secondes
+      setInterval(loadNotificationCount, 30000);
+
+      // Forcer l'activation de l'onglet "Amis" si on clique sur l'icône amis même déjà sur profil
+      document.addEventListener('DOMContentLoaded', function() {
+        var amisLink = document.querySelector('a[href="/utilisateurs/profil/#amis"]');
+        if (amisLink) {
+          amisLink.addEventListener('click', function(e) {
+            if (window.location.pathname === '/utilisateurs/profil/') {
+              setTimeout(function () {
+                var amisTab = document.getElementById('amis-tab');
+                var amisPane = document.getElementById('amis');
+                if (amisTab && amisPane && !amisPane.classList.contains('show')) {
+                  if (!amisTab.getAttribute('data-bs-toggle')) {
+                    amisTab.setAttribute('data-bs-toggle', 'tab');
+                  }
+                  if (window.bootstrap && bootstrap.Tab) {
+                    var tab = new bootstrap.Tab(amisTab);
+                    tab.show();
+                  } else {
+                    amisTab.dispatchEvent(new MouseEvent('click', {bubbles:true}));
+                  }
+                }
+              }, 100);
+            }
+          });
         }
-
-        // Charger le compteur au chargement de la page
-        document.addEventListener('DOMContentLoaded', loadNotificationCount);
-        
-        // Actualiser le compteur toutes les 30 secondes
-        setInterval(loadNotificationCount, 30000);
+      });
+      // Correction pour dropdown qui ne s'ouvre pas sur la page profil
+      document.addEventListener('DOMContentLoaded', function() {
+        var dropdownBtn = document.querySelector('.dropdown-toggle[data-bs-toggle="dropdown"]');
+        var dropdownMenu = document.querySelector('.dropdown-menu');
+        if (dropdownBtn && dropdownMenu) {
+          dropdownBtn.addEventListener('click', function(e) {
+            setTimeout(function() {
+              if (!dropdownMenu.classList.contains('show')) {
+                dropdownMenu.classList.add('show');
+              }
+            }, 50);
+          });
+        }
+      });
     </script>
-    {% endif %}
-{% endblock %}
-
-</body>
+    {% endif %} {% endblock %}
+  </body>
 </html>

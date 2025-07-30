@@ -20,16 +20,42 @@
     <div class="ms-3 d-flex flex-column justify-content-center">
       <h2 class="card-text">{{ user_profil.first_name }} {{ user_profil.last_name }}</h2>
 
-      <p class="card-text"><i class="fas fa-at me-2"></i>{{ user_profil.username }}</p>
+      <p class="card-text m-0"><i class="fas fa-at me-2"></i>{{ user_profil.username }}</p>
+      <p class="card-text m-0"><i class="fas fa-user-friends me-2"></i>{{ amis|length }} ami{% if amis|length > 1 %}s{% endif %}</p>
+
     </div>
   </div>
 
-  {% if is_own_profile %}
   <div class="d-flex gap-2">
-    <button class="btn btn-primary"> <i class="fas fa-plus me-2"></i>Ajouter à la story </button>
-    <a href="{% url 'mon_compte' %}" class="btn btn-outline-primary">
-      <i class="fas fa-edit me-2"></i>Modifier le profil
-    </a>
+    {% if is_own_profile %}
+      <button class="btn btn-primary"> <i class="fas fa-plus me-2"></i>Ajouter à la story </button>
+      <a href="{% url 'mon_compte' %}" class="btn btn-outline-primary">
+        <i class="fas fa-edit me-2"></i>Modifier le profil
+      </a>
+    {% else %}
+      {% if est_ami %}
+        <div class="d-flex gap-2">
+          <span class="btn btn-success disabled" style="pointer-events: none; opacity: 0.8;">
+            <i class="fas fa-user-friends me-2"></i>Vous êtes amis
+          </span>
+          <form method="post" action="{% url 'amis:action_ami' 'supprimer' user_profil.id %}" onsubmit="return confirm('Voulez-vous vraiment supprimer cet ami ?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger"><i class="fas fa-user-minus me-2"></i>Supprimer des amis</button>
+          </form>
+        </div>
+      {% elif demande_envoyee %}
+        <button class="btn btn-secondary" disabled><i class="fas fa-hourglass-half me-2"></i>Demande envoyée</button>
+      {% elif demande_recue %}
+        <form method="post" action="{% url 'amis:action_ami' 'accepter' user_profil.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success"><i class="fas fa-user-check me-2"></i>Accepter en ami</button>
+        </form>
+      {% else %}
+        <form method="post" action="{% url 'amis:action_ami' 'ajouter' user_profil.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary"><i class="fas fa-user-plus me-2"></i>Ajouter en ami</button>
+        </form>
+      {% endif %}
+    {% endif %}
   </div>
-  {% endif %}
 </div>

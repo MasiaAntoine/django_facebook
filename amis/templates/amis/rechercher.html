@@ -15,19 +15,20 @@
                                 type="text"
                                 class="form-control"
                                 name="q"
+                                id="search-input"
                                 value="{{ query }}"
                                 placeholder="Rechercher par nom, prénom ou ville..."
                                 aria-label="Rechercher des amis"
+                                autocomplete="off"
                         />
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-search"></i>
-                            Rechercher
-                        </button>
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
                     </div>
                 </form>
 
                 <!-- Résultats de recherche -->
-                {% if query %}
+                <div id="search-results">
+                    {# Les résultats seront injectés ici par JS #}
+                    {% if query %}
                     <h4 class="mb-3">Résultats pour "{{ query }}"</h4>
                     {% if utilisateurs %}
                         <div class="row">
@@ -52,13 +53,16 @@
                                                     </div>
                                                 {% endif %}
                                                 <div class="flex-grow-1">
-                                                    <h6 class="card-title mb-1">{{ utilisateur.first_name }} {{ utilisateur.last_name }}</h6>
+                                                    <h6 class="card-title mb-1">
+                                                        <a href="{% url 'profil_user' utilisateur.id %}" class="text-decoration-none text-dark">
+                                                            {{ utilisateur.first_name }} {{ utilisateur.last_name }}
+                                                        </a>
+                                                    </h6>
                                                     <p class="card-text text-muted mb-0">@{{ utilisateur.username }}</p>
                                                     {% if utilisateur.ville %}
                                                         <p class="card-text text-muted mb-0"><i class="fas fa-map-marker-alt"></i> {{ utilisateur.ville }}</p>
                                                     {% endif %}
                                                 </div>
-                                                <button class="btn btn-outline-primary btn-sm">Ajouter</button>
                                             </div>
                                         </div>
                                     </div>
@@ -70,10 +74,45 @@
                             <i class="fas fa-info-circle"></i>
                             Aucun utilisateur trouvé pour "{{ query }}".
                         </div>
-                    {% endif %} {% endif %}
+                    {% endif %}
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('search-input');
+    const results = document.getElementById('search-results');
+    let lastQuery = input.value;
+    let controller = null;
+
+    function fetchResults(query) {
+        if (controller) controller.abort();
+        controller = new AbortController();
+        fetch(window.location.pathname + '?q=' + encodeURIComponent(query), {signal: controller.signal, headers: {'X-Requested-With': 'XMLHttpRequest'}})
+            .then(r => r.text())
+            .then(html => {
+                // Extraire juste le bloc #search-results du HTML retourné
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newResults = doc.getElementById('search-results');
+                if (newResults) results.innerHTML = newResults.innerHTML;
+            });
+    }
+
+    input.addEventListener('input', function() {
+        const query = input.value.trim();
+        history.replaceState(null, '', window.location.pathname + (query ? '?q=' + encodeURIComponent(query) : ''));
+        lastQuery = query;
+        fetchResults(query);
+    });
+});
+</script>
 {% endblock %}
 
 

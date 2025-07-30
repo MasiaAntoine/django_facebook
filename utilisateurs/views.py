@@ -134,12 +134,14 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 	def get_context_data(self, **kwargs):
 		from posts.models import Post
 		from django.contrib.auth import get_user_model
-		
+		from amis.models import Ami
+		from django.db.models import Q
+
 		context = super().get_context_data(**kwargs)
-		
+
 		# Récupérer l'ID de l'utilisateur depuis l'URL (optionnel)
 		user_id = kwargs.get('user_id')
-		
+
 		if user_id:
 			# Afficher le profil d'un autre utilisateur (existence déjà vérifiée dans get())
 			user_profil = get_user_model().objects.get(id=user_id)
@@ -148,21 +150,83 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 			# Afficher son propre profil
 			user_profil = self.request.user
 			is_own_profile = True
-		
+
 		context['user_profil'] = user_profil
 		context['is_own_profile'] = is_own_profile
-		
+
 		# Calculer les statistiques publiques (toujours visibles)
 		total_posts = Post.objects.filter(user=user_profil).count()
 		context['user_stats'] = {
 			'total_posts': total_posts,
 			'member_since': user_profil.date_joined,
 		}
+
+		# Récupérer les amis de l'utilisateur
+		amis_relations = Ami.objects.filter(
+			Q(demandeur=user_profil, accepter=True) |
+			Q(receveur=user_profil, accepter=True)
+		).select_related('demandeur', 'receveur')
+
+		# Extraire les utilisateurs amis (en excluant l'utilisateur lui-même)
+		amis = []
+		amis_ids = set()  # Pour éviter les doublons
 		
+		for relation in amis_relations:
+			if relation.demandeur == user_profil:
+				ami = relation.receveur
+			else:
+				ami = relation.demandeur
+			
+			# Éviter les doublons
+			if ami.id not in amis_ids:
+				amis_ids.add(ami.id)
+				
+				# Calculer les amis en commun si c'est le profil d'un autre utilisateur
+				if not is_own_profile:
+					amis_communs = Ami.objects.filter(
+						Q(demandeur=self.request.user, receveur=ami, accepter=True) |
+						Q(demandeur=ami, receveur=self.request.user, accepter=True)
+					).count()
+					ami.amis_communs = amis_communs
+				else:
+					ami.amis_communs = 0
+				
+				amis.append(ami)
+
+		context['amis'] = amis
+
+		# --- Ajout pour bouton ami ---
+		est_ami = False
+		demande_envoyee = False
+		demande_recue = False
+		if not is_own_profile:
+			# Vérifie si une relation d'amitié existe dans les deux sens et acceptée
+			est_ami = Ami.objects.filter(
+				(
+					Q(demandeur=self.request.user, receveur=user_profil) |
+					Q(demandeur=user_profil, receveur=self.request.user)
+				) & Q(accepter=True)
+			).exists()
+			# Vérifie si une demande a été envoyée (non acceptée)
+			demande_envoyee = Ami.objects.filter(
+				demandeur=self.request.user,
+				receveur=user_profil,
+				accepter=False
+			).exists()
+			# Vérifie si une demande a été reçue (non acceptée)
+			demande_recue = Ami.objects.filter(
+				demandeur=user_profil,
+				receveur=self.request.user,
+				accepter=False
+			).exists()
+		context['est_ami'] = est_ami
+		context['demande_envoyee'] = demande_envoyee
+		context['demande_recue'] = demande_recue
+
 		# Si ce n'est pas un profil privé OU si c'est son propre profil, afficher les posts
 		if not user_profil.est_privee or is_own_profile:
 			context['user_posts'] = Post.objects.filter(user=user_profil).order_by('-created_at')
 		else:
 			context['user_posts'] = []
-		
+
 		return context
