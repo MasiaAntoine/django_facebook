@@ -1,5 +1,5 @@
 {% load static %}
-{#{% load reactions_tags %}#}
+{% load reactions_tags %}
 <div class="modal fade" id="modalPost{{ post.id }}" tabindex="-1" aria-labelledby="modalPostLabel{{ post.id }}"
      aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -35,17 +35,17 @@
                     {% if post.category %}
                         <p><strong>Catégorie :</strong> {{ post.category.title }}</p>
                     {% endif %}
-{#                    {% for reaction in reaction_types %}#}
-{#                        <form method="post" action="{% url 'interactions:ajout_reaction' %}">#}
-{#                            {% csrf_token %}#}
-{#                            <input type="hidden" name="post_id" value="{{ post.id }}">#}
-{#                            <input type="hidden" name="type" value="{{ reaction.type }}">#}
-{#                            <button type="submit" class="btn btn-sm btn-outline-secondary">#}
-{#                                {{ reaction.emoji }}#}
+                    {% for reaction in reaction_types %}
+                        <form method="post" action="{% url 'interactions:ajout_reaction' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="post_id" value="{{ post.id }}">
+                            <input type="hidden" name="type" value="{{ reaction.type }}">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                {{ reaction.emoji }}
 {#                                {% count_reactions grouped_reactions 1 "like" %}#}
-{#                            </button>#}
-{#                        </form>#}
-{#                    {% endfor %}#}
+                            </button>
+                        </form>
+                    {% endfor %}
                 </div>
 
                 <!-- Col droite -->
