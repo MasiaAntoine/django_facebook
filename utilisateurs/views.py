@@ -195,6 +195,34 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 
 		context['amis'] = amis
 
+		# --- Ajout pour bouton ami ---
+		est_ami = False
+		demande_envoyee = False
+		demande_recue = False
+		if not is_own_profile:
+			# Vérifie si une relation d'amitié existe dans les deux sens et acceptée
+			est_ami = Ami.objects.filter(
+				(
+					Q(demandeur=self.request.user, receveur=user_profil) |
+					Q(demandeur=user_profil, receveur=self.request.user)
+				) & Q(accepter=True)
+			).exists()
+			# Vérifie si une demande a été envoyée (non acceptée)
+			demande_envoyee = Ami.objects.filter(
+				demandeur=self.request.user,
+				receveur=user_profil,
+				accepter=False
+			).exists()
+			# Vérifie si une demande a été reçue (non acceptée)
+			demande_recue = Ami.objects.filter(
+				demandeur=user_profil,
+				receveur=self.request.user,
+				accepter=False
+			).exists()
+		context['est_ami'] = est_ami
+		context['demande_envoyee'] = demande_envoyee
+		context['demande_recue'] = demande_recue
+
 		# Si ce n'est pas un profil privé OU si c'est son propre profil, afficher les posts
 		if not user_profil.est_privee or is_own_profile:
 			context['user_posts'] = Post.objects.filter(user=user_profil).order_by('-created_at')
