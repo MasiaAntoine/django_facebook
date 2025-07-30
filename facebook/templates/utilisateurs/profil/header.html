@@ -3,26 +3,30 @@
 <!-- Header du profil -->
 <div class="d-flex align-items-center justify-content-between">
   <div class="d-flex align-items-center">
-    {% if user_profil.photo_profil and user_profil.photo_profil.url %}
-    <img
-      src="{{ user_profil.photo_profil.url }}"
-      alt="Photo de profil"
-      class="rounded-circle mb-3"
-      style="height: 150px; width: 150px; object-fit: cover;" />
-    {% else %}
-    <img
-      src="{% static 'default_logo/default.webp' %}"
-      alt="Photo de profil"
-      class="rounded-circle mb-3"
-      style="height: 150px; width: 150px; object-fit: cover;" />
+    {% if not est_bloque %}
+      {% if user_profil.photo_profil and user_profil.photo_profil.url %}
+      <img
+        src="{{ user_profil.photo_profil.url }}"
+        alt="Photo de profil"
+        class="rounded-circle mb-3"
+        style="height: 150px; width: 150px; object-fit: cover;" />
+      {% else %}
+      <img
+        src="{% static 'default_logo/default.webp' %}"
+        alt="Photo de profil"
+        class="rounded-circle mb-3"
+        style="height: 150px; width: 150px; object-fit: cover;" />
+      {% endif %}
     {% endif %}
 
     <div class="ms-3 d-flex flex-column justify-content-center">
       <h2 class="card-text">{{ user_profil.first_name }} {{ user_profil.last_name }}</h2>
 
       <p class="card-text m-0"><i class="fas fa-at me-2"></i>{{ user_profil.username }}</p>
+      
+      {% if not est_bloque %}
       <p class="card-text m-0"><i class="fas fa-user-friends me-2"></i>{{ amis|length }} ami{% if amis|length > 1 %}s{% endif %}</p>
-
+      {% endif %}
     </div>
   </div>
 
@@ -33,29 +37,39 @@
         <i class="fas fa-edit me-2"></i>Modifier le profil
       </a>
     {% else %}
-      {% if est_ami %}
-        <div class="d-flex gap-2">
-          <span class="btn btn-success disabled" style="pointer-events: none; opacity: 0.8;">
-            <i class="fas fa-user-friends me-2"></i>Vous êtes amis
-          </span>
-          <form method="post" action="{% url 'amis:action_ami' 'supprimer' user_profil.id %}" onsubmit="return confirm('Voulez-vous vraiment supprimer cet ami ?');">
+      {% if not est_bloque and not est_bloque_par %}
+        {% if est_ami %}
+          <div class="d-flex gap-2">
+            <span class="btn btn-success disabled" style="pointer-events: none; opacity: 0.8;">
+              <i class="fas fa-user-friends me-2"></i>Vous êtes amis
+            </span>
+            <form method="post" action="{% url 'amis:action_ami' 'supprimer' user_profil.id %}" onsubmit="return confirm('Voulez-vous vraiment supprimer cet ami ?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger"><i class="fas fa-user-minus me-2"></i>Supprimer des amis</button>
+            </form>
+          </div>
+        {% elif demande_envoyee %}
+          <button class="btn btn-secondary" disabled><i class="fas fa-hourglass-half me-2"></i>Demande envoyée</button>
+        {% elif demande_recue %}
+          <form method="post" action="{% url 'amis:action_ami' 'accepter' user_profil.id %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger"><i class="fas fa-user-minus me-2"></i>Supprimer des amis</button>
+            <button type="submit" class="btn btn-success"><i class="fas fa-user-check me-2"></i>Accepter en ami</button>
           </form>
-        </div>
-      {% elif demande_envoyee %}
-        <button class="btn btn-secondary" disabled><i class="fas fa-hourglass-half me-2"></i>Demande envoyée</button>
-      {% elif demande_recue %}
-        <form method="post" action="{% url 'amis:action_ami' 'accepter' user_profil.id %}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-success"><i class="fas fa-user-check me-2"></i>Accepter en ami</button>
-        </form>
-      {% else %}
-        <form method="post" action="{% url 'amis:action_ami' 'ajouter' user_profil.id %}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-primary"><i class="fas fa-user-plus me-2"></i>Ajouter en ami</button>
-        </form>
+        {% else %}
+          <form method="post" action="{% url 'amis:action_ami' 'ajouter' user_profil.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary"><i class="fas fa-user-plus me-2"></i>Ajouter en ami</button>
+          </form>
+        {% endif %}
       {% endif %}
+      <form method="post" action="{% url 'bloquer_user' user_profil.id %}" style="display:inline;">
+        {% csrf_token %}
+        {% if est_bloque %}
+          <button type="submit" class="btn btn-warning"><i class="fas fa-unlock me-2"></i>Débloquer</button>
+        {% else %}
+          <button type="submit" class="btn btn-danger"><i class="fas fa-ban me-2"></i>Bloquer</button>
+        {% endif %}
+      </form>
     {% endif %}
   </div>
 </div>

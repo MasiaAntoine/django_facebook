@@ -15,3 +15,7 @@ class Ami(models.Model):
 
 	def __str__(self):
 		return f"{self.demandeur} -> {self.receveur}"
+
+	@staticmethod
+	def is_blocked(user1, user2):
+		return Ami.objects.filter(demandeur=user2, receveur=user1, bloquer=True).exists()
