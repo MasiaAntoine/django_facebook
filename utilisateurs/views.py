@@ -255,25 +255,30 @@ class ActionBloquerView(LoginRequiredMixin, View):
 			return redirect('home')
 		if cible == request.user:
 			return redirect('profil')
+		
+		# On cherche une relation existante
 		ami_relation = Ami.objects.filter(
 			Q(demandeur=request.user, receveur=cible) | Q(demandeur=cible, receveur=request.user)
 		).first()
-		if ami_relation:
-			if ami_relation.demandeur == request.user and ami_relation.bloquer:
-				ami_relation.bloquer = False
-				ami_relation.save()
-			else:
-				ami_relation.demandeur = request.user
-				ami_relation.receveur = cible
-				ami_relation.bloquer = True
-				ami_relation.accepter = False
-				ami_relation.save()
+		
+		if ami_relation and ami_relation.demandeur == request.user and ami_relation.bloquer:
+			# Déblocage : on supprime juste le blocage, pas de demande d'ami
+			ami_relation.bloquer = False
+			ami_relation.save()
+			# Supprimer toute demande d'ami non acceptée dans les deux sens
+			Ami.objects.filter(
+				(
+					Q(demandeur=request.user, receveur=cible) |
+					Q(demandeur=cible, receveur=request.user)
+				) & Q(accepter=False)
+			).delete()
 		else:
+			# Blocage : on supprime toute relation d'amitié (acceptée ou non)
+			Ami.objects.filter(
+				Q(demandeur=request.user, receveur=cible) | Q(demandeur=cible, receveur=request.user)
+			).delete()
+			# On crée une relation de blocage
 			Ami.objects.create(demandeur=request.user, receveur=cible, bloquer=True)
-		Ami.objects.filter(
-			Q(demandeur=request.user, receveur=cible) | Q(demandeur=cible, receveur=request.user),
-			accepter=True
-		).update(accepter=False)
+		
 		messages.success(request, "Action de blocage/déblocage effectuée.")
-  
 		return redirect('profil_user', user_id=cible.id)

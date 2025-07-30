@@ -49,7 +49,10 @@
             </form>
           </div>
         {% elif demande_envoyee %}
-          <button class="btn btn-secondary" disabled><i class="fas fa-hourglass-half me-2"></i>Demande envoyée</button>
+          {# On n'affiche plus ce bouton si la personne vient d'être débloquée, car il n'y a plus de demande envoyée #}
+          {% if not est_bloque and not est_bloque_par %}
+            <button class="btn btn-secondary" disabled><i class="fas fa-hourglass-half me-2"></i>Demande envoyée</button>
+          {% endif %}
         {% elif demande_recue %}
           <form method="post" action="{% url 'amis:action_ami' 'accepter' user_profil.id %}">
             {% csrf_token %}
