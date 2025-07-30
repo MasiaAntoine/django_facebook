@@ -15,7 +15,7 @@
                              style="width: 40px; height: 40px; object-fit: cover;">
                     {% endif %}
                     <div>
-                        <a href="#"
+                        <a href="{% url 'profil_user' post.user.id %}"
                            class="text-decoration-none fw-bold">{{ post.user.first_name }} {{ post.user.last_name }}</a><br>
                         <small class="text-muted">{{ post.created_at|date:"d M Y, H:i" }}</small>
                     </div>
@@ -36,14 +36,19 @@
                         <p><strong>Catégorie :</strong> {{ post.category.title }}</p>
                     {% endif %}
                     {% for reaction in reaction_types %}
-                        <form method="post" action="{% url 'interactions:ajout_reaction' %}">
+                        <form method="post" action="{% url 'interactions:ajout_reaction' %}"
+                              style="display: inline-block;">
                             {% csrf_token %}
                             <input type="hidden" name="post_id" value="{{ post.id }}">
                             <input type="hidden" name="type" value="{{ reaction.type }}">
-                            <button type="submit" class="btn btn-sm btn-outline-secondary">
-                                {{ reaction.emoji }}
-{#                                {% count_reactions grouped_reactions 1 "like" %}#}
-                            </button>
+                            {% with user_reactions|get_item:post.id as user_react %}
+                                {% count_reactions grouped_reactions post.id reaction.type as total_reacts %}
+                                <button type="submit"
+                                        class="btn btn-sm {% if user_react and user_react.type == reaction.type %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+                                        {% if user_react and user_react.type == reaction.type %}disabled{% endif %}>
+                                    {{ reaction.emoji }} {{ total_reacts }}
+                                </button>
+                            {% endwith %}
                         </form>
                     {% endfor %}
                 </div>
@@ -54,7 +59,18 @@
                     <div class="flex-grow-1">
                         {% for commentaire in post.commentaire_set.all %}
                             <div class="mb-3">
-                                <strong>{{ commentaire.user.username }}</strong><br>
+                                {% if commentaire.user.photo_profil and commentaire.user.photo_profil.url %}
+                                    <img
+                                            src="{{ commentaire.user.photo_profil.url }}"
+                                            alt="Mon compte"
+                                            class="rounded-circle"
+                                            style="height: 35px; width: 35px; object-fit: cover;"/>
+                                {% else %}
+                                    <img src="{% static "default_logo/default.webp" %}" alt="Mon compte"
+                                         class="rounded-circle"
+                                         style="height: 35px; width: 35px; object-fit: cover;">
+                                {% endif %}
+                                <a href="{% url 'profil_user' commentaire.user.id %}"><strong>{{ commentaire.user.username }}</strong><br></a>
                                 <small class="text-muted">{{ commentaire.created_at|date:"d M Y, H:i" }}</small>
                                 <p class="mb-0">{{ commentaire.contenu }}</p>
                             </div>

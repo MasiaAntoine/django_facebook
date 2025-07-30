@@ -22,7 +22,7 @@
 {% else %}
 <!-- prettier-ignore -->
 {% include "utilisateurs/profil/header.html" %}
-    {% if user_profil.est_privee and not is_own_profile %}
+    {% if user_profil.est_privee and not is_own_profile and not est_ami %}
 <!-- Profil privé -->
 <div class="text-center mt-5">
   <div class="card shadow-sm mx-auto" style="max-width: 500px">
