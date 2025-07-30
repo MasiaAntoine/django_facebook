@@ -46,42 +46,18 @@ de {{ user_profil.username }}{% endif %} {% endblock %} {% block content %}
     </div>
   </div>
 </div>
-{% else %}
-<!-- Sous-menu avec onglets -->
-<ul class="nav nav-tabs my-4" id="profileTabs" role="tablist">
-  <li class="nav-item" role="presentation">
-    <button
-      class="nav-link active"
-      id="publications-tab"
-      data-bs-toggle="tab"
-      data-bs-target="#publications"
-      type="button"
-      role="tab"
-      aria-controls="publications"
-      aria-selected="true">
-      <i class="fas fa-newspaper me-2"></i>Publications
-    </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button
-      class="nav-link"
-      id="about-tab"
-      data-bs-toggle="tab"
-      data-bs-target="#about"
-      type="button"
-      role="tab"
-      aria-controls="about"
-      aria-selected="false">
-      <i class="fas fa-info-circle me-2"></i>À propos
-    </button>
-  </li>
-</ul>
+{% else %} {% include "utilisateurs/profil/menu.html" %}
 
 <!-- Contenu des onglets -->
 <div class="tab-content" id="profileTabsContent">
   <!-- Onglet Publications -->
   <div class="tab-pane fade show active" id="publications" role="tabpanel" aria-labelledby="publications-tab">
     {% include "utilisateurs/profil/publications.html" %}
+  </div>
+
+  <!-- Onglet Amis -->
+  <div class="tab-pane fade" id="amis" role="tabpanel" aria-labelledby="amis-tab">
+    {% include "utilisateurs/profil/ami.html" %}
   </div>
 
   <!-- Onglet À propos -->
