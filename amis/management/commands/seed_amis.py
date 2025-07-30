@@ -14,9 +14,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         fake = Faker('fr_FR')
         
-        # Reset: supprimer toutes les relations d'amitié existantes
-        self.stdout.write('Suppression des relations d\'amitié existantes...')
-        Ami.objects.all().delete()
+        # Ne supprime plus aucune relation d'amitié existante
+        self.stdout.write('Aucune suppression de relations d\'amitié existantes (préservation totale).')
         
         # Récupérer tous les utilisateurs
         users = list(User.objects.all())
@@ -32,24 +31,39 @@ class Command(BaseCommand):
         amis = []
         created_pairs = set()
         
-        # Créer environ 30 relations d'amitié
-        for i in range(30):
+        # Récupérer les relations existantes pour éviter les doublons
+        existing_relations = set()
+        for relation in Ami.objects.all():
+            existing_relations.add((relation.demandeur.id, relation.receveur.id))
+        
+        # Créer environ 30 nouvelles relations d'amitié
+        attempts = 0
+        max_attempts = 100  # Éviter une boucle infinie
+        
+        while len(amis) < 30 and attempts < max_attempts:
+            attempts += 1
+            
             demandeur = random.choice(users)
             receveur = random.choice(users)
             
             # Éviter les auto-relations et les doublons
             if demandeur != receveur:
-                pair = tuple(sorted([demandeur.id, receveur.id]))
-                if pair not in created_pairs:
-                    created_pairs.add(pair)
+                # Vérifier si cette relation existe déjà (dans les deux sens)
+                if ((demandeur.id, receveur.id) not in existing_relations and
+                    (receveur.id, demandeur.id) not in existing_relations):
                     
-                    ami = Ami.objects.create(
-                        demandeur=demandeur,
-                        receveur=receveur,
-                        accepter=random.choice([True, False]),
-                        bloquer=random.choice([True, False]) if random.random() < 0.1 else False
-                    )
-                    amis.append(ami)
+                    pair = tuple(sorted([demandeur.id, receveur.id]))
+                    if pair not in created_pairs:
+                        created_pairs.add(pair)
+                        existing_relations.add((demandeur.id, receveur.id))
+                        
+                        ami = Ami.objects.create(
+                            demandeur=demandeur,
+                            receveur=receveur,
+                            accepter=random.choice([True, False]),
+                            bloquer=random.choice([True, False]) if random.random() < 0.1 else False
+                        )
+                        amis.append(ami)
                     
         self.stdout.write(
             self.style.SUCCESS(f'Seeder amis terminé : {len(amis)} relations d\'amitié créées')

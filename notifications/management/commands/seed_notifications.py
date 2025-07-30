@@ -12,11 +12,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         fake = Faker('fr_FR')
-        
-        # Reset: supprimer toutes les notifications existantes
-        self.stdout.write('Suppression des notifications existantes...')
-        Notification.objects.all().delete()
-        
+        # Ne supprime plus les notifications existantes
+        self.stdout.write('Aucune suppression des notifications existantes (préservation totale).')
         # Récupérer tous les utilisateurs
         users = list(User.objects.all())
         

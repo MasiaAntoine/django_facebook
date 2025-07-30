@@ -60,11 +60,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         fake = Faker('fr_FR')
-        
-        # Reset: supprimer tous les utilisateurs existants
-        self.stdout.write('Suppression des utilisateurs existants...')
-        User.objects.all().delete()
-        
+        # Ne supprime plus les utilisateurs existants
+        self.stdout.write('Aucune suppression des utilisateurs existants (préservation totale).')
         # Créer 20 utilisateurs aléatoires
         self.stdout.write('Création de 20 utilisateurs aléatoires avec photos de profil...')
         users = []

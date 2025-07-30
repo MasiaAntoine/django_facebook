@@ -13,13 +13,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         fake = Faker('fr_FR')
-        
-        # Reset: supprimer toutes les interactions existantes
-        self.stdout.write('Suppression des interactions existantes...')
-        Reaction.objects.all().delete()
-        Commentaire.objects.all().delete()
-        Partage.objects.all().delete()
-        
+        # Ne supprime plus les interactions existantes
+        self.stdout.write('Aucune suppression des interactions existantes (préservation totale).')
         # Récupérer tous les utilisateurs et posts
         users = list(User.objects.all())
         posts = list(Post.objects.all())

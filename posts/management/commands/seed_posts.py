@@ -12,12 +12,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         fake = Faker('fr_FR')
-        
-        # Reset: supprimer toutes les catégories et posts existants
-        self.stdout.write('Suppression des posts et catégories existants...')
-        Post.objects.all().delete()
-        Category.objects.all().delete()
-        
+        # Ne supprime plus les posts et catégories existants
+        self.stdout.write('Aucune suppression des posts et catégories existants (préservation totale).')
         # Créer 5 catégories
         self.stdout.write('Création des catégories...')
         categories = []
