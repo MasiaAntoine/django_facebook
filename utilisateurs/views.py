@@ -6,10 +6,8 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import FormView, TemplateView
 from django.views.decorators.csrf import csrf_protect
-from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
-from django.http import HttpResponseForbidden
-
+from posts.views import ListingMyPostsView
 from utilisateurs.forms import InscriptionForm, ConnexionForm, ProfilForm, CustomPasswordChangeForm
 from amis.models import Ami
 from django.db.models import Q
@@ -19,7 +17,7 @@ class InscriptionView(FormView):
 	template_name = 'utilisateurs/inscription.html'
 	form_class = InscriptionForm
 	success_url = reverse_lazy('home')
-	
+
 	def form_valid(self, form):
 		user = form.save()
 		login(self.request, user)
@@ -30,13 +28,13 @@ class ConnexionView(FormView):
 	template_name = 'utilisateurs/connexion.html'
 	form_class = ConnexionForm
 	success_url = reverse_lazy('home')
-	
+
 	def get_form_kwargs(self):
 		kwargs = super().get_form_kwargs()
 		if self.request.method == 'POST':
 			kwargs['data'] = self.request.POST
 		return kwargs
-	
+
 	def form_valid(self, form):
 		user = form.get_user()
 		login(self.request, user)
@@ -47,7 +45,7 @@ class DeconnexionView(View):
 	def get(self, request):
 		logout(request)
 		return redirect('connexion')
-	
+
 	def post(self, request):
 		logout(request)
 		return redirect('connexion')
@@ -57,7 +55,7 @@ class DeconnexionView(View):
 class SupprimerCompteView(LoginRequiredMixin, TemplateView):
 	template_name = 'utilisateurs/supprimer_compte.html'
 	login_url = reverse_lazy('connexion')
-	
+
 	def post(self, request):
 		user = request.user
 		logout(request)
@@ -69,17 +67,17 @@ class SupprimerCompteView(LoginRequiredMixin, TemplateView):
 class MonCompteView(LoginRequiredMixin, TemplateView):
 	template_name = 'utilisateurs/mon_compte.html'
 	login_url = reverse_lazy('connexion')
-	
+
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		user = self.request.user
 		context['profil_form'] = ProfilForm(instance=user)
 		context['password_form'] = CustomPasswordChangeForm(user)
 		return context
-	
+
 	def post(self, request):
 		user = request.user
-		
+
 		if 'update_profil' in request.POST:
 			profil_form = ProfilForm(request.POST, request.FILES, instance=user)
 			if profil_form.is_valid():
@@ -92,7 +90,7 @@ class MonCompteView(LoginRequiredMixin, TemplateView):
 					'profil_form': profil_form,
 					'password_form': password_form
 				})
-		
+
 		elif 'update_password' in request.POST:
 			password_form = CustomPasswordChangeForm(user, request.POST)
 			if password_form.is_valid():
@@ -106,14 +104,14 @@ class MonCompteView(LoginRequiredMixin, TemplateView):
 					'profil_form': profil_form,
 					'password_form': password_form
 				})
-		
+
 		return redirect('mon_compte')
 
 
 class ProfilView(LoginRequiredMixin, TemplateView):
 	template_name = 'utilisateurs/profil.html'
 	login_url = reverse_lazy('connexion')
-	
+
 	def get(self, request, *args, **kwargs):
 		user_id = kwargs.get('user_id')
 		if user_id and user_id == request.user.id:
@@ -141,7 +139,11 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 
 		context = super().get_context_data(**kwargs)
 		user_id = kwargs.get('user_id')
+		listing_view = ListingMyPostsView()
+		listing_view.request = self.request
+		listing_view.object_list = listing_view.get_queryset()
 
+		context = listing_view.get_context_data(**kwargs)
 		if user_id:
 			from django.contrib.auth import get_user_model
 			user_profil = get_user_model().objects.get(id=user_id)
@@ -175,17 +177,17 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 		# Extraire les utilisateurs amis (en excluant l'utilisateur lui-même)
 		amis = []
 		amis_ids = set()  # Pour éviter les doublons
-		
+
 		for relation in amis_relations:
 			if relation.demandeur == user_profil:
 				ami = relation.receveur
 			else:
 				ami = relation.demandeur
-			
+
 			# Éviter les doublons
 			if ami.id not in amis_ids:
 				amis_ids.add(ami.id)
-				
+
 				# Calculer les amis en commun si c'est le profil d'un autre utilisateur
 				if not is_own_profile:
 					amis_communs = Ami.objects.filter(
@@ -195,14 +197,16 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 					ami.amis_communs = amis_communs
 				else:
 					ami.amis_communs = 0
-				
+
 				amis.append(ami)
 
 		context['amis'] = amis
 
 		# Ajout pour bouton bloquer/débloquer
-		est_bloque = Ami.objects.filter(demandeur=self.request.user, receveur=user_profil, bloquer=True).exists() if not is_own_profile else False
-		est_bloque_par = Ami.objects.filter(demandeur=user_profil, receveur=self.request.user, bloquer=True).exists() if not is_own_profile else False
+		est_bloque = Ami.objects.filter(demandeur=self.request.user, receveur=user_profil,
+		                                bloquer=True).exists() if not is_own_profile else False
+		est_bloque_par = Ami.objects.filter(demandeur=user_profil, receveur=self.request.user,
+		                                    bloquer=True).exists() if not is_own_profile else False
 		context['est_bloque'] = est_bloque
 		context['est_bloque_par'] = est_bloque_par
 
@@ -214,8 +218,8 @@ class ProfilView(LoginRequiredMixin, TemplateView):
 			# Vérifie si une relation d'amitié existe dans les deux sens et acceptée
 			est_ami = Ami.objects.filter(
 				(
-					Q(demandeur=self.request.user, receveur=user_profil) |
-					Q(demandeur=user_profil, receveur=self.request.user)
+						Q(demandeur=self.request.user, receveur=user_profil) |
+						Q(demandeur=user_profil, receveur=self.request.user)
 				) & Q(accepter=True)
 			).exists()
 			# Vérifie si une demande a été envoyée (non acceptée)
@@ -255,12 +259,12 @@ class ActionBloquerView(LoginRequiredMixin, View):
 			return redirect('home')
 		if cible == request.user:
 			return redirect('profil')
-		
+
 		# On cherche une relation existante
 		ami_relation = Ami.objects.filter(
 			Q(demandeur=request.user, receveur=cible) | Q(demandeur=cible, receveur=request.user)
 		).first()
-		
+
 		if ami_relation and ami_relation.demandeur == request.user and ami_relation.bloquer:
 			# Déblocage : on supprime juste le blocage, pas de demande d'ami
 			ami_relation.bloquer = False
@@ -268,8 +272,8 @@ class ActionBloquerView(LoginRequiredMixin, View):
 			# Supprimer toute demande d'ami non acceptée dans les deux sens
 			Ami.objects.filter(
 				(
-					Q(demandeur=request.user, receveur=cible) |
-					Q(demandeur=cible, receveur=request.user)
+						Q(demandeur=request.user, receveur=cible) |
+						Q(demandeur=cible, receveur=request.user)
 				) & Q(accepter=False)
 			).delete()
 		else:
@@ -279,6 +283,6 @@ class ActionBloquerView(LoginRequiredMixin, View):
 			).delete()
 			# On crée une relation de blocage
 			Ami.objects.create(demandeur=request.user, receveur=cible, bloquer=True)
-		
+
 		messages.success(request, "Action de blocage/déblocage effectuée.")
 		return redirect('profil_user', user_id=cible.id)

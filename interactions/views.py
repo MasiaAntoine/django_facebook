@@ -24,6 +24,7 @@ class CommentaireCreateView(LoginRequiredMixin, CreateView):
 
 class ReactionCreateView(LoginRequiredMixin, CreateView):
 	model = Reaction
+	login_url = '/utilisateurs/connexion/'
 	fields = ['type']
 	http_method_names = ['post']
 
