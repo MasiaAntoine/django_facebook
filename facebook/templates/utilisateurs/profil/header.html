@@ -3,26 +3,30 @@
 <!-- Header du profil -->
 <div class="d-flex align-items-center justify-content-between">
   <div class="d-flex align-items-center">
-    {% if user_profil.photo_profil and user_profil.photo_profil.url %}
-    <img
-      src="{{ user_profil.photo_profil.url }}"
-      alt="Photo de profil"
-      class="rounded-circle mb-3"
-      style="height: 150px; width: 150px; object-fit: cover;" />
-    {% else %}
-    <img
-      src="{% static 'default_logo/default.webp' %}"
-      alt="Photo de profil"
-      class="rounded-circle mb-3"
-      style="height: 150px; width: 150px; object-fit: cover;" />
+    {% if not est_bloque %}
+      {% if user_profil.photo_profil and user_profil.photo_profil.url %}
+      <img
+        src="{{ user_profil.photo_profil.url }}"
+        alt="Photo de profil"
+        class="rounded-circle mb-3"
+        style="height: 150px; width: 150px; object-fit: cover;" />
+      {% else %}
+      <img
+        src="{% static 'default_logo/default.webp' %}"
+        alt="Photo de profil"
+        class="rounded-circle mb-3"
+        style="height: 150px; width: 150px; object-fit: cover;" />
+      {% endif %}
     {% endif %}
 
     <div class="ms-3 d-flex flex-column justify-content-center">
       <h2 class="card-text">{{ user_profil.first_name }} {{ user_profil.last_name }}</h2>
 
       <p class="card-text m-0"><i class="fas fa-at me-2"></i>{{ user_profil.username }}</p>
+      
+      {% if not est_bloque %}
       <p class="card-text m-0"><i class="fas fa-user-friends me-2"></i>{{ amis|length }} ami{% if amis|length > 1 %}s{% endif %}</p>
-
+      {% endif %}
     </div>
   </div>
 

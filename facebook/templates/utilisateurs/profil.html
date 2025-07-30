@@ -12,6 +12,13 @@
     <h4><i class="fas fa-ban me-2"></i> Cet utilisateur vous a bloqué.</h4>
     <p>Vous ne pouvez pas voir ce profil.</p>
   </div>
+{% elif est_bloque %}
+  <!-- Affiche seulement le header et un message si vous avez bloqué l'utilisateur -->
+  {% include "utilisateurs/profil/header.html" %}
+  <div class="alert alert-warning text-center mt-5">
+    <h4><i class="fas fa-ban me-2"></i> Vous avez bloqué cet utilisateur.</h4>
+    <p>Vous ne pouvez pas voir ses informations.</p>
+  </div>
 {% else %}
 <!-- prettier-ignore -->
 {% include "utilisateurs/profil/header.html" %}
