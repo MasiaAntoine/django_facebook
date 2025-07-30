@@ -10,17 +10,18 @@ class BasePostListView(ListView):
     model = Post
     template_name = "posts/allPosts.html"
     context_object_name = "posts"
-    filter_by_user = None  # Par défaut : pas de filtrage utilisateur
+    filter_by_user_id = None  # Peut être défini dynamiquement
 
     def get_queryset(self):
         qs = Post.objects.filter(is_story=False)
-        if self.filter_by_user:
-            qs = qs.filter(user=self.request.user)
+        user_id = self.kwargs.get('user_id') or self.filter_by_user_id
+        if user_id:
+            qs = qs.filter(user__id=user_id)
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        posts = context['posts']  # récupère le queryset filtré
+        posts = context['posts']
 
         grouped_reactions = (
             Reaction.objects
@@ -47,10 +48,12 @@ class BasePostListView(ListView):
             "user_reactions": user_reactions,
         })
         return context
-
 class ListingAllPostsView(BasePostListView):
     filter_by_user = False  # Affiche tous les posts
 
 
 class ListingMyPostsView(BasePostListView):
-    filter_by_user = True  # Affiche uniquement mes posts
+    def get_queryset(self):
+        user_id = self.kwargs.get("user_id") if hasattr(self, 'kwargs') else self.request.GET.get("user_id")
+        self.filter_by_user_id = user_id
+        return super().get_queryset()

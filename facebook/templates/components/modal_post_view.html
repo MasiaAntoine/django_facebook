@@ -59,7 +59,18 @@
                     <div class="flex-grow-1">
                         {% for commentaire in post.commentaire_set.all %}
                             <div class="mb-3">
-                                <strong>{{ commentaire.user.username }}</strong><br>
+                                {% if commentaire.user.photo_profil and commentaire.user.photo_profil.url %}
+                                    <img
+                                            src="{{ commentaire.user.photo_profil.url }}"
+                                            alt="Mon compte"
+                                            class="rounded-circle"
+                                            style="height: 35px; width: 35px; object-fit: cover;"/>
+                                {% else %}
+                                    <img src="{% static "default_logo/default.webp" %}" alt="Mon compte"
+                                         class="rounded-circle"
+                                         style="height: 35px; width: 35px; object-fit: cover;">
+                                {% endif %}
+                                <a href="{% url 'profil_user' commentaire.user.id %}"><strong>{{ commentaire.user.username }}</strong><br></a>
                                 <small class="text-muted">{{ commentaire.created_at|date:"d M Y, H:i" }}</small>
                                 <p class="mb-0">{{ commentaire.contenu }}</p>
                             </div>

@@ -9,6 +9,7 @@ class HomeView(TemplateView):
 	def get_context_data(self, **kwargs):
 		listing_view = ListingAllPostsView()
 		listing_view.request = self.request
+		listing_view.kwargs = {}
 		listing_view.object_list = listing_view.get_queryset()
 
 		context = listing_view.get_context_data(**kwargs)
