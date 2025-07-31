@@ -1,5 +1,7 @@
 from django.template.loader import render_to_string
 from django.views.generic import TemplateView
+
+from posts.forms import PostForm
 from posts.views import ListingAllPostsView
 
 
@@ -14,4 +16,5 @@ class HomeView(TemplateView):
 
 		context = listing_view.get_context_data(**kwargs)
 		context['modal_body_search'] = render_to_string("components/modal_search_body.html", request=self.request)
+		context['form'] = PostForm()
 		return context

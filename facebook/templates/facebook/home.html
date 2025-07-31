@@ -3,5 +3,22 @@
 {% block title %}Accueil{% endblock %}
 
 {% block content %}
+    <!-- Créer un post -->
+    {% if user.is_authenticated %}
+        <div class="create-post-box">
+            <a href="{% url 'profil_user' user.id %}">
+                {% if user.photo_profil %}
+                <img src="{{ user.photo_profil.url }}"
+                     alt="Profile picture" class="profile-img"/>
+                    {% else %}
+                    <img src="{% static 'default_logo/default.webp' %}"
+                     alt="Profile picture" class="profile-img"/>
+                    {% endif %}
+            </a>
+            <input type="text" placeholder="Quoi de neuf, {{ user.first_name|default:user.username }} ?"
+                   data-bs-toggle="modal" data-bs-target="#createPostModal" readonly>
+        </div>
+        {% include "components/modal_add_posts.html" %}
+    {% endif %}
     {% include 'posts/allPosts.html' %}
 {% endblock %}

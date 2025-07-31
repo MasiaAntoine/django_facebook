@@ -17,9 +17,14 @@ class Post(models.Model):
 	title = models.CharField(max_length=255)
 	description = models.TextField(blank=True)
 	category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
-	photos = models.ImageField(upload_to='photos/posts/', null=True, blank=True)
 	is_story = models.BooleanField(default=False)
 	created_at = models.DateTimeField(auto_now_add=True)
 
 	def __str__(self):
 		return f"{self.title} - {self.user.username}"
+
+
+class PostImage(models.Model):
+	post = models.ForeignKey(Post, related_name='images', on_delete=models.CASCADE)
+	image = models.ImageField(upload_to='photos/posts/')
+	uploaded_at = models.DateTimeField(auto_now_add=True)
