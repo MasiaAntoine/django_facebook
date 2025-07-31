@@ -17,4 +17,5 @@ class HomeView(TemplateView):
 		context = listing_view.get_context_data(**kwargs)
 		context['modal_body_search'] = render_to_string("components/modal_search_body.html", request=self.request)
 		context['form'] = PostForm()
+		context['posts'] = listing_view.object_list
 		return context

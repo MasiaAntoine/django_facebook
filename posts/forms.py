@@ -10,7 +10,7 @@ class PostForm(forms.ModelForm):
 
 	class Meta:
 		model = Post
-		fields = ['title', 'description', 'category', 'images']
+		fields = ['title', 'description', 'category', 'images', 'is_story']
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)

@@ -1,0 +1,97 @@
+{% load static %}
+{% load has_story %}
+
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="mb-4">Tous les posts</h2>
+
+    {% for post in posts %}
+        <div class="card mb-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalPost{{ post.id }}"
+             style="cursor: pointer;">
+            <div class="card-header d-flex align-items-center">
+                {% has_active_story post.user as story_exists %}
+                <a
+                        {% if story_exists %}
+                            href="#" data-bs-toggle="modal" data-bs-target="#storyModal{{ post.user.id }}"
+                        {% else %}
+                            href="{% url 'profil_user' post.user.id %}"
+                        {% endif %}
+                            class="me-2"
+                >
+                    <img src="{% if post.user.photo_profil and post.user.photo_profil.url %}
+                                 {{ post.user.photo_profil.url }}
+                             {% else %}
+                                 {% static 'default_logo/default.webp' %}
+                             {% endif %}"
+                         class="rounded-circle {% if story_exists %}border border-primary border-3{% endif %}"
+                         style="height: 40px; width: 40px; object-fit: cover;">
+                </a>
+
+                <div>
+                    <strong>{{ post.user.username }}</strong><br>
+                    <small class="text-muted">{{ post.created_at|date:"d M Y, H:i" }}</small>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title">{{ post.title }}</h5>
+                {% if post.category %}
+                    <p><em>Catégorie : {{ post.category.title }}</em></p>
+                {% endif %}
+                <p class="card-text">{{ post.description }}</p>
+
+                {% if post.images.all %}
+                    <div id="carouselPost{{ post.id }}" class="carousel slide mb-3" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for image in post.images.all %}
+                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                    <img src="{{ image.image.url }}" class="d-block w-100"
+                                         style="max-height:400px; object-fit:cover;"
+                                         alt="Image {{ forloop.counter }}">
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if post.images.count > 1 %}
+                            <button class="carousel-control-prev" type="button"
+                                    data-bs-target="#carouselPost{{ post.id }}" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Précédent</span>
+                            </button>
+                            <button class="carousel-control-next" type="button"
+                                    data-bs-target="#carouselPost{{ post.id }}" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Suivant</span>
+                            </button>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% include 'components/modal_post_view.html' with post=post %}
+
+        {# Modale story pour cet utilisateur #}
+        {% if story_exists %}
+            <div class="modal fade" id="storyModal{{ post.user.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content bg-dark text-white">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title">{{ post.user.username }}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body d-flex justify-content-center align-items-center">
+                            {% with post.user.posts.filter(is_story=True).order_by('-created_at').first as story %}
+                                {% if story and story.images.first %}
+                                    <img src="{{ story.images.first.image.url }}" class="img-fluid rounded">
+                                {% else %}
+                                    <p class="text-muted">Aucune image</p>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% empty %}
+        <p>Aucun post à afficher.</p>
+    {% endfor %}
+</div>

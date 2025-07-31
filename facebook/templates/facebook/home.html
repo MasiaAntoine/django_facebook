@@ -8,12 +8,12 @@
         <div class="create-post-box">
             <a href="{% url 'profil_user' user.id %}">
                 {% if user.photo_profil %}
-                <img src="{{ user.photo_profil.url }}"
-                     alt="Profile picture" class="profile-img"/>
-                    {% else %}
+                    <img src="{{ user.photo_profil.url }}"
+                         alt="Profile picture" class="profile-img"/>
+                {% else %}
                     <img src="{% static 'default_logo/default.webp' %}"
-                     alt="Profile picture" class="profile-img"/>
-                    {% endif %}
+                         alt="Profile picture" class="profile-img"/>
+                {% endif %}
             </a>
             <input type="text" placeholder="Quoi de neuf, {{ user.first_name|default:user.username }} ?"
                    data-bs-toggle="modal" data-bs-target="#createPostModal" readonly>

@@ -1,7 +1,11 @@
+from datetime import timedelta
+
 from django.db.models import Count, Prefetch
+from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import ListView, FormView, CreateView
+from django.utils.timezone import now
 
 from interactions.models import Reaction
 from posts.models import Post, PostImage
@@ -83,3 +87,50 @@ class CreatePostView(CreateView):
 			PostImage.objects.create(post=post, image=f)
 
 		return super().form_valid(form)
+
+
+class StoryListView(ListView):
+	model = Post
+	template_name = 'posts/stories_list.html'
+	context_object_name = 'stories'
+
+	def get_queryset(self):
+		twenty_four_hours_ago = now() - timedelta(hours=24)
+		return Post.objects.filter(
+			is_story=True,
+			created_at__gte=twenty_four_hours_ago
+		).select_related('user').prefetch_related('images')
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		stories = self.get_queryset()
+
+		latest_stories_per_user = {}
+		for story in stories:
+			user_id = story.user.id
+			if user_id not in latest_stories_per_user:
+				latest_stories_per_user[user_id] = {
+					'user': story.user,
+					'story': story
+				}
+
+		context['users_with_story'] = latest_stories_per_user.values()
+		return context
+
+
+class CreateStoryView(CreateView):
+	model = Post
+	fields = ['title', 'description']  # Pas de catégorie ici
+	success_url = reverse_lazy('home')  # Redirection après succès
+
+	def post(self, request, *args, **kwargs):
+		post = Post.objects.create(
+			user=request.user,
+			title=request.POST.get('title', ''),
+			description=request.POST.get('description', ''),
+			is_story=True
+		)
+		if 'images' in request.FILES:
+			PostImage.objects.create(post=post, image=request.FILES['images'])
+
+		return redirect(self.success_url)
