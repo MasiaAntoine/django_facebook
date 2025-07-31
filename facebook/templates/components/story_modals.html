@@ -1,0 +1,22 @@
+{# posts/components/story_modals.html #}
+{% for story_data in users_with_story %}
+    {% with user=story_data.user story=story_data.story %}
+        <div class="modal fade" id="storyModal{{ user.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title">{{ user.username }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body d-flex justify-content-center align-items-center">
+                        {% if story.images.first %}
+                            <img src="{{ story.images.first.image.url }}" class="img-fluid rounded">
+                        {% else %}
+                            <p class="text-muted">Aucune image</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endwith %}
+{% endfor %}
