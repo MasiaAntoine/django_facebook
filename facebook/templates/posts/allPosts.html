@@ -7,7 +7,7 @@
              style="cursor: pointer;">
             <div class="card-header d-flex align-items-center">
                 <!-- Photo profil ou initiale -->
-                <div style="width: 40px; height: 40px; border-radius: 50%; background-color:#007bff; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:18px; margin-right: 12px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:18px; margin-right: 12px;">
                     {% if post.user.photo_profil and post.user.photo_profil.url %}
                         <img src="{{ post.user.photo_profil.url }}" alt="Mon compte" class="rounded-circle"
                              style="height: 35px; width: 35px; object-fit: cover;">

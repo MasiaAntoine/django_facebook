@@ -9,11 +9,13 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body d-flex justify-content-center align-items-center">
-                        {% if story.images.first %}
-                            <img src="{{ story.images.first.image.url }}" class="img-fluid rounded">
-                        {% else %}
-                            <p class="text-muted">Aucune image</p>
-                        {% endif %}
+                        {% with story.images.all.0 as img %}
+                            {% if img %}
+                                <img src="{{ img.image.url }}" class="img-fluid rounded">
+                            {% else %}
+                                <p class="text-muted">Aucune image</p>
+                            {% endif %}
+                        {% endwith %}
                     </div>
                 </div>
             </div>
