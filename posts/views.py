@@ -96,6 +96,7 @@ class StoryListView(ListView):
 
 	def get_queryset(self):
 		twenty_four_hours_ago = now() - timedelta(hours=24)
+
 		return Post.objects.filter(
 			is_story=True,
 			created_at__gte=twenty_four_hours_ago
@@ -116,7 +117,6 @@ class StoryListView(ListView):
 
 		context['users_with_story'] = latest_stories_per_user.values()
 		return context
-
 
 class CreateStoryView(CreateView):
 	model = Post

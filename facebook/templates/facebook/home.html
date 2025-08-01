@@ -5,6 +5,7 @@
 {% block content %}
     <!-- Créer un post -->
     {% if user.is_authenticated %}
+        {#        ajout de petites cartes pour afficher les stories, au clique sur une carte, ouvrir une modal pour afficher la story#}
         <div class="create-post-box">
             <a href="{% url 'profil_user' user.id %}">
                 {% if user.photo_profil %}
@@ -19,6 +20,23 @@
                    data-bs-toggle="modal" data-bs-target="#createPostModal" readonly>
         </div>
         {% include "components/modal_add_posts.html" %}
+
+        <div class="d-flex gap-3 overflow-auto mb-4">
+            {% for item in users_with_story %}
+                {% with user=item.user story=item.story %}
+                    <div class="text-center" style="width: 80px;">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#storyModal{{ user.id }}">
+                            <img src="
+                                    {% if user.photo_profil %}{{ user.photo_profil.url }}{% else %}{% static 'default_logo/default.webp' %}{% endif %}"
+                                 class="rounded-circle border {% if story.is_story %}border-primary{% else %}border-secondary{% endif %}"
+                                 style="width: 60px; height: 60px; object-fit: cover;">
+                        </a>
+                        <small class="d-block text-truncate">{{ user.username }}</small>
+                    </div>
+                {% endwith %}
+            {% endfor %}
+        </div>
+        {% include 'components/story_modals.html' %}
     {% endif %}
     {% include 'posts/allPosts.html' %}
 {% endblock %}
