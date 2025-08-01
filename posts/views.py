@@ -4,6 +4,7 @@ from django.db.models import Count, Prefetch
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import ListView, FormView, CreateView
 from django.utils.timezone import now
 
@@ -89,21 +90,15 @@ class CreatePostView(CreateView):
 		return super().form_valid(form)
 
 
-class StoryListView(ListView):
-	model = Post
-	template_name = 'posts/stories_list.html'
-	context_object_name = 'stories'
-
+class StoryListView(View):
 	def get_queryset(self):
 		twenty_four_hours_ago = now() - timedelta(hours=24)
-
 		return Post.objects.filter(
 			is_story=True,
 			created_at__gte=twenty_four_hours_ago
-		).select_related('user').prefetch_related('images')
+		).select_related('user').prefetch_related('images').order_by('-created_at')
 
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
+	def get_context_data(self):
 		stories = self.get_queryset()
 
 		latest_stories_per_user = {}
@@ -115,8 +110,10 @@ class StoryListView(ListView):
 					'story': story
 				}
 
-		context['users_with_story'] = latest_stories_per_user.values()
-		return context
+		return {
+			'users_with_story': list(latest_stories_per_user.values())
+		}
+
 
 class CreateStoryView(CreateView):
 	model = Post
