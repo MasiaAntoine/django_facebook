@@ -41,21 +41,33 @@
                                                     <a href="{% url 'profil_user' notification.emetteur.id %}" style="text-decoration: none; color: inherit;">
                                                         <strong>{{ notification.emetteur.get_full_name }}</strong>
                                                     </a>
-                                                    {{ notification.message }}
+                                                    {% if notification.type == 'comment' %}
+                                                        a commenté votre post.
+                                                    {% elif notification.type == 'like' or notification.type == 'reaction' %}
+                                                        a aimé votre post.
+                                                    {% elif notification.type == 'friend_request' %}
+                                                        vous a envoyé une demande d’ami.
+                                                    {% elif notification.type == 'friend_accept' %}
+                                                        a accepté votre demande d’ami.
+                                                    {% elif notification.type == 'share' %}
+                                                        a partagé votre post.
+                                                    {% endif %}
                                                 </p>
                                                 <small class="text-muted">
                                                     <i class="far fa-clock"></i>
                                                     {{ notification.date|timesince }} ago
                                                 </small>
                                             </div>
-                                            
+
                                             <div class="text-end">
-                                                {% if notification.type == 'like' %}
+                                                {% if notification.type == 'like' or notification.type == 'reaction' %}
                                                     <i class="fa-solid fa-heart text-danger"></i>
                                                 {% elif notification.type == 'comment' %}
                                                     <i class="fa-solid fa-comment text-primary"></i>
                                                 {% elif notification.type == 'friend_request' %}
                                                     <i class="fa-solid fa-user-plus text-success"></i>
+                                                {% elif notification.type == 'friend_accept' %}
+                                                    <i class="fa-solid fa-user-check text-success"></i>
                                                 {% elif notification.type == 'share' %}
                                                     <i class="fa-solid fa-share text-info"></i>
                                                 {% endif %}
