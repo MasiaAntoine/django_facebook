@@ -110,7 +110,7 @@ class Command(BaseCommand):
         )
         
         # Télécharger et assigner la photo de profil de Maël depuis l'URL
-        mael_image_url = 'https://media.licdn.com/dms/image/v2/D4E03AQHHXP24k4ym1Q/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1682530646392?e=2147483647&v=beta&t=sF5v_uwWgc9aO21edJuhDLIuhKoyEjAqlMHV6CsJX4U'
+        mael_image_url = 'https://scontent-cdg4-2.cdninstagram.com/v/t51.2885-19/498682209_18301623964244205_1426888806743377396_n.jpg?stp=dst-jpg_s150x150_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby4xMDgwLmMyIn0&_nc_ht=scontent-cdg4-2.cdninstagram.com&_nc_cat=109&_nc_oc=Q6cZ2QH_YzOXa8J29cr7jbS_sgQwvDk3eke548C8GHAvf8LHFejoeh2rD9BsPx82h5SHSaAUxqNjBk5hLrgB0Pj41QSZ&_nc_ohc=o_s5nMwffaUQ7kNvwHVdoay&_nc_gid=Kfd4WcKg3XHUI5NSdNQcdg&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfQxOYAl0tLI3JToZ9mm2l39NLaUauMnc8nTthSAM3bWPw&oe=68925249&_nc_sid=8b3546'
         
         self.stdout.write('Téléchargement de la photo de profil Maël...')
         mael_profile_image = self.download_profile_image_from_url(mael_image_url, 'mbadet')
