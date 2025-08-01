@@ -1,22 +1,17 @@
 from django.contrib import admin
 from .models import Notification
 
-
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ['utilisateur', 'emetteur', 'type', 'message_court', 'lu', 'date']
+    list_display = ['utilisateur', 'emetteur', 'type', 'lu', 'date']
     list_filter = ['type', 'lu', 'date']
-    search_fields = ['utilisateur__username', 'emetteur__username', 'message']
+    search_fields = ['utilisateur__username', 'emetteur__username']
     ordering = ['-date']
     readonly_fields = ['date']
     
-    def message_court(self, obj):
-        return obj.message[:50] + "..." if len(obj.message) > 50 else obj.message
-    message_court.short_description = 'Message'
-    
     fieldsets = (
         ('Participants', {'fields': ('utilisateur', 'emetteur')}),
-        ('Notification', {'fields': ('type', 'message', 'lu')}),
+        ('Notification', {'fields': ('type', 'lu')}),
         ('Métadonnées', {'fields': ('date',)}),
     )
     

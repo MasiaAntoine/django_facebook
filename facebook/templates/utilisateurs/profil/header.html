@@ -25,8 +25,7 @@
             <p class="card-text m-0"><i class="fas fa-at me-2"></i>{{ user_profil.username }}</p>
 
             {% if not est_bloque %}
-                <p class="card-text m-0"><i class="fas fa-user-friends me-2"></i>{{ amis|length }} ami
-                    {% if amis|length > 1 %}s{% endif %}</p>
+                <p class="card-text m-0"><i class="fas fa-user-friends me-2"></i>{{ amis|length }} ami(e){% if amis|length > 1 %}s{% endif %}</p>
             {% endif %}
         </div>
     </div>

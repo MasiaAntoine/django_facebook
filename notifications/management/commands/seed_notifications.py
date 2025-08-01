@@ -28,27 +28,15 @@ class Command(BaseCommand):
         notifications = []
         notif_types = ['like', 'comment', 'friend_request', 'share']
         
-        messages_templates = {
-            'like': 'a aimé votre publication',
-            'comment': 'a commenté votre publication',
-            'friend_request': 'vous a envoyé une demande d\'ami',
-            'share': 'a partagé votre publication'
-        }
-        
         for i in range(60):
             utilisateur = random.choice(users)
             emetteur = random.choice([u for u in users if u != utilisateur])
             notif_type = random.choice(notif_types)
             
-            message = messages_templates[notif_type].format(
-                emetteur=emetteur.get_full_name() or emetteur.username
-            )
-            
             notification = Notification.objects.create(
                 utilisateur=utilisateur,
                 emetteur=emetteur,
                 type=notif_type,
-                message=message,
                 lu=random.choice([True, False])
             )
             notifications.append(notification)

@@ -34,7 +34,6 @@ class AmisActionsView(TemplateView):
                 utilisateur=receveur,
                 emetteur=demandeur,
                 type_notif='friend_request',
-                message=f"vous a envoyé une demande d'ami."
             )
         return redirect('profil_user', user_id=receveur.id)
 
@@ -62,7 +61,6 @@ class AmisActionsView(TemplateView):
                 utilisateur=autre_utilisateur,
                 emetteur=utilisateur,
                 type_notif='friend_accept',
-                message=f"a accepté votre demande d'ami."
             )
         return redirect('profil_user', user_id=autre_utilisateur.id)
 

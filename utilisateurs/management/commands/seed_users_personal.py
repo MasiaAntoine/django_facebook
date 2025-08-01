@@ -454,37 +454,35 @@ class Command(BaseCommand):
         
         # Notifications pour Antoine
         notifications_antoine = [
-            (mael, 'friend_request', f'{mael.first_name} {mael.last_name} a accepté votre demande d\'ami'),
-            (random.choice(all_users), 'like', 'a aimé votre publication'),
-            (random.choice(all_users), 'comment', 'a commenté votre publication'),
-            (random.choice(all_users), 'friend_request', 'vous a envoyé une demande d\'ami'),
+            (mael, 'friend_request'),
+            (random.choice(all_users), 'like'),
+            (random.choice(all_users), 'comment'),
+            (random.choice(all_users), 'friend_request'),
         ]
         
-        for emetteur, type_notif, message in notifications_antoine:
+        for emetteur, type_notif in notifications_antoine:
             if emetteur != antoine:
                 Notification.objects.create(
                     utilisateur=antoine,
                     emetteur=emetteur,
                     type=type_notif,
-                    message=f"{emetteur.first_name} {emetteur.last_name} {message}",
                     lu=random.choice([True, False]),
                     date=timezone.now() - timedelta(hours=random.randint(1, 72))
                 )
         
         # Notifications pour Maël
         notifications_mael = [
-            (antoine, 'friend_request', f'{antoine.first_name} {antoine.last_name} a accepté votre demande d\'ami'),
-            (random.choice(all_users), 'like', 'a aimé votre publication'),
-            (random.choice(all_users), 'comment', 'a commenté votre publication'),
+            (antoine, 'friend_request'),
+            (random.choice(all_users), 'like'),
+            (random.choice(all_users), 'comment'),
         ]
         
-        for emetteur, type_notif, message in notifications_mael:
+        for emetteur, type_notif in notifications_mael:
             if emetteur != mael:
                 Notification.objects.create(
                     utilisateur=mael,
                     emetteur=emetteur,
                     type=type_notif,
-                    message=f"{emetteur.first_name} {emetteur.last_name} {message}",
                     lu=random.choice([True, False]),
                     date=timezone.now() - timedelta(hours=random.randint(1, 72))
                 )
